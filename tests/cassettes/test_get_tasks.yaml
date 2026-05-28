@@ -1,0 +1,184 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/me
+  response:
+    body:
+      string: '{"id":13186279,"default_workspace_id":21407567}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '584'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 20 May 2026 19:35:13 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 6790386dc72e6aa01107c2e3f08dcc66
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '596'
+      X-Toggl-Quota-Resets-In:
+      - '3599'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects
+  response:
+    body:
+      string: '[{"id":219958848,"workspace_id":21407567,"client_id":null,"name":"Alpha","is_private":true,"active":true,"at":"2026-05-20T19:34:32+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#4dc3ff","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":4,"actual_seconds":15600,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958850,"workspace_id":21407567,"client_id":null,"name":"Beta","is_private":true,"active":true,"at":"2026-05-20T19:34:33+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#8ab734","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":7800,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958851,"workspace_id":21407567,"client_id":null,"name":"Gamma","is_private":true,"active":true,"at":"2026-05-20T19:34:34+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#f68d38","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":9000,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '1927'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 20 May 2026 19:35:13 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Page:
+      - '1'
+      X-Page-Size:
+      - '151'
+      X-Request-ID:
+      - 9b012f6f0a36de1aa57fb293b5192e62
+      X-Service-Level:
+      - GREEN
+      X-Sort-Field:
+      - project_name
+      X-Sort-Order:
+      - asc
+      X-Toggl-Quota-Remaining:
+      - '581'
+      X-Toggl-Quota-Resets-In:
+      - '3558'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks
+  response:
+    body:
+      string: '[{"id":242178346,"name":"Research","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0},{"id":242178347,"name":"Implementation","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '471'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 20 May 2026 19:35:13 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-lkcdp
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 03452eaf4ac6fc1390dbe1fa43ff410c
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '580'
+      X-Toggl-Quota-Resets-In:
+      - '3558'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1
