@@ -1,0 +1,116 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/me
+  response:
+    body:
+      string: '{"id":13186279,"default_workspace_id":21407567}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '585'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 10:51:48 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - c66044c717b6cf5453af853cf5a5246b
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '596'
+      X-Toggl-Quota-Resets-In:
+      - '3057'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"name":""}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '11'
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/clients
+  response:
+    body:
+      string: '"Client name cannot be empty"'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '29'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 10:51:48 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - cc38acd328015a64a45d36571108d92c
+      X-Toggl-Quota-Remaining:
+      - '597'
+      X-Toggl-Quota-Resets-In:
+      - '3057'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 400
+      message: Bad Request
+version: 1

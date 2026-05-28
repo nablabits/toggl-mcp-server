@@ -1,0 +1,120 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/me
+  response:
+    body:
+      string: '{"id":13186279,"api_token":"REDACTED","email":"REDACTED","fullname":"Nablabits","timezone":"Europe/Madrid","2fa_enabled":false,"toggl_accounts_id":"KPdpGGLUK6rWsaiFmNhv8y","default_workspace_id":21407567,"beginning_of_week":1,"image_url":"https://assets.track.toggl.com/images/profile.png","created_at":"2026-05-18T18:50:58.219746Z","updated_at":"2026-05-20T18:22:27.637339Z","openid_email":null,"openid_enabled":false,"country_id":208,"has_password":true,"at":"2026-05-23T11:42:36.508574Z","authorization_updated_at":"2026-05-23T10:42:45.348237418Z"}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '585'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 11:42:36 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-lkcdp
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 9526e283117dc0c35e652923efc0664d
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '592'
+      X-Toggl-Quota-Resets-In:
+      - '9'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/tags
+  response:
+    body:
+      string: '[{"id":20464801,"workspace_id":21407567,"name":"dev","at":"2026-05-20T18:25:18.265461Z","creator_id":13186279},{"id":20464810,"workspace_id":21407567,"name":"docs","at":"2026-05-20T18:27:27.64345Z","creator_id":13186279},{"id":20464800,"workspace_id":21407567,"name":"meeting","at":"2026-05-20T18:25:11.945088Z","creator_id":13186279},{"id":20464809,"workspace_id":21407567,"name":"review","at":"2026-05-20T18:27:26.980459Z","creator_id":13186279}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '448'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 11:42:36 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 06ba0675cacd71140a970dd42371130c
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '594'
+      X-Toggl-Quota-Resets-In:
+      - '9'
+      X-Total-Count:
+      - '4'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1

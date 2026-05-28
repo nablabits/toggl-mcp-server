@@ -1,0 +1,52 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/1/tags
+  response:
+    body:
+      string: '"workspace not found/accessible"'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '32'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 11:42:35 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-lkcdp
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - c1008dd3f979dc39a4a0c4291bb23c0c
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 403
+      message: Forbidden
+version: 1
