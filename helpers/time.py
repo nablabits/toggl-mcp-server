@@ -30,7 +30,7 @@ def _iso_timestamp(dt: datetime.datetime) -> str:
 
 
 def _get_date_range(days_offset: int) -> Tuple[str, str]:
-    today_utc = datetime.datetime.utcnow().date()
+    today_utc = datetime.datetime.now(datetime.timezone.utc).date()
     target_date = today_utc + timedelta(days=days_offset)
     start_dt = datetime.datetime.combine(target_date, datetime.time.min, tzinfo=timezone.utc)
     end_dt = start_dt + timedelta(days=1)
