@@ -1,0 +1,62 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/me/time_entries?start_date=2026-05-19&end_date=2026-05-20
+  response:
+    body:
+      string: '[{"id":4415272765,"workspace_id":21407567,"project_id":219958850,"task_id":null,"billable":false,"start":"2026-05-19T15:00:00+00:00","stop":"2026-05-19T15:40:00+00:00","duration":2400,"description":"Weekly
+        review","tags":["docs","review"],"tag_ids":[20464810,20464809],"duronly":true,"at":"2026-05-20T19:34:40.634291Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958850},{"id":4415272751,"workspace_id":21407567,"project_id":219958848,"task_id":null,"billable":false,"start":"2026-05-19T11:00:00+00:00","stop":"2026-05-19T11:50:00+00:00","duration":3000,"description":"Testing","tags":["dev"],"tag_ids":[20464801],"duronly":true,"at":"2026-05-20T19:34:39.96412Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958848},{"id":4415272731,"workspace_id":21407567,"project_id":219958851,"task_id":null,"billable":false,"start":"2026-05-19T09:00:00+00:00","stop":"2026-05-19T11:00:00+00:00","duration":7200,"description":"Feature
+        work","tags":["dev"],"tag_ids":[20464801],"duronly":true,"at":"2026-05-20T19:34:39.283868Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958851}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '1182'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 27 May 2026 18:03:26 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 8c4beeb8a8dc2a5f49bb666a4eef17c7
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '595'
+      X-Toggl-Quota-Resets-In:
+      - '2450'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1
