@@ -28,3 +28,4 @@ htmlcov/
 
 # Claude Code project settings
 .claude/
+CLAUDE.md
