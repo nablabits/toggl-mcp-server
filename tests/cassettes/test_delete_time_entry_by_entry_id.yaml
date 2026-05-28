@@ -1,0 +1,121 @@
+interactions:
+- request:
+    body: '{"created_with":"toggl_mcp_server","description":"Delete-by-id test entry","start":"2026-05-27T18:16:52.000Z","duration":-1,"billable":false,"workspace_id":21407567}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '165'
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/time_entries
+  response:
+    body:
+      string: '{"id":4423475901,"workspace_id":21407567,"project_id":null,"task_id":null,"billable":false,"start":"2026-05-27T18:16:52Z","stop":null,"duration":-1,"description":"Delete-by-id
+        test entry","tags":null,"tag_ids":null,"duronly":true,"at":"2026-05-27T18:16:52.995025Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '339'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 27 May 2026 18:16:53 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-lkcdp
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - f9cec312b74b7e54640b8c11c009bcaa
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '595'
+      X-Toggl-Quota-Resets-In:
+      - '1644'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: DELETE
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/time_entries/4423475901
+  response:
+    body:
+      string: ''
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '0'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 27 May 2026 18:16:53 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 8a20a9e9585ae8bad2da5b4ad87f775a
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '594'
+      X-Toggl-Quota-Resets-In:
+      - '1644'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1
