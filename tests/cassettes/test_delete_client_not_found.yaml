@@ -1,0 +1,119 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/me
+  response:
+    body:
+      string: '{"id":13186279,"default_workspace_id":21407567}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '585'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 10:42:46 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-lkcdp
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 97c2a857e9c06632f0420f1979c09381
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '597'
+      X-Toggl-Quota-Resets-In:
+      - '3599'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/clients
+  response:
+    body:
+      string: '[{"id":68751302,"wid":21407567,"archived":false,"name":"Bar","at":"2026-05-18T18:54:20+00:00","creator_id":13186279,"total_count":2},{"id":68751298,"wid":21407567,"archived":false,"name":"Sample
+        Client","at":"2026-05-18T18:53:35+00:00","creator_id":13186279,"total_count":2}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '275'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sat, 23 May 2026 10:42:46 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-ppt5f
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Request-ID:
+      - 7a17c57821e82ac35a6cdf583d3a96de
+      X-Service-Level:
+      - GREEN
+      X-Toggl-Quota-Remaining:
+      - '598'
+      X-Toggl-Quota-Resets-In:
+      - '3600'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1
