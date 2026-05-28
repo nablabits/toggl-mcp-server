@@ -4,14 +4,27 @@
 
 # Secrets
 .env
+.env-test
 
 # Python cache
 __pycache__/
 *.py[cod]
 *.pyo
+*.egg-info/
 
 # macOS
 .DS_Store
 
 # uv (optional if you rebuild env fresh)
 !uv.lock
+
+# coverage
+.coverage
+htmlcov/
+
+# code editors
+.vscode/
+.idea/
+
+# Claude Code project settings
+.claude/
