@@ -68,41 +68,6 @@ This was forked from [abhinav24jha/toggl-mcp-server](https://github.com/abhinav2
 | `update_client` | Rename a client or update its notes |
 | `delete_client` | Delete a client by name |
 
-## Code Structure
-
-The server is organised by domain. Each module owns its low-level API helpers and the `@mcp.tool()` functions for that domain:
-
-```text
-toggl-mcp-server/
-├── toggl_mcp_server.py   # entry point — mcp.run()
-├── app.py                # FastMCP instance, auth headers, Endpoints, TOGGL_COLORS
-├── helpers/
-│   ├── http.py           # toggl_request — authenticated HTTP with rate-limit handling
-│   └── time.py           # _get_current_utc_time, _iso_timestamp, _get_date_range, …
-├── projects.py           # helpers + tools: create/delete/update/get_all_projects
-├── tasks.py              # helpers + tools: get/create/update/delete_task
-├── time_entries.py       # helpers + tools: new/stop/delete/update/get time entries
-├── tags.py               # helpers + tools: get/create/update/delete_tag
-├── clients.py            # helpers + tools: get/create/update/delete_client
-└── resources.py          # MCP resources + name→ID lookup helpers (workspace cache)
-```
-
-**Key conventions:**
-
-- `_` prefix = low-level helper (ID-based, internal). No prefix = `@mcp.tool()` (name-based, user-facing).
-- Helpers return `str` on error; callers check `isinstance(result, str)` before proceeding.
-- All HTTP calls use `httpx.AsyncClient` via `async`/`await`.
-
-## Limitations
-
-- **Time entries limit:** `get_time_entries_for_range` is capped at a **90-day rolling window** by the Toggl API — dates older than ~3 months are rejected. Toggl exposes Reports endpoints for historical data, but those do not return `time_entry_id` values, so individual historical entries cannot be addressed, updated, or deleted through this MCP server.
-
-- **Throttling:**
-  - **429 Too Many Requests** — leaky bucket rate limiter (≈1 req/s per token/IP); back off for a few minutes
-  - **402 Payment Required** — sliding window quota per user per org (30 req/h on free, 240 on Starter, 600 on Premium); headers `X-Toggl-Quota-Remaining` and `X-Toggl-Quota-Resets-In` indicate remaining budget.
-  - The `/me` endpoint is subject to a hard limit of 30 requests/hour regardless of plan ([docs](https://engineering.toggl.com/docs/track/)). A couple of guardrails have been added to mitigate this limitation: 
-    - Set `TOGGL_WORKSPACE_ID` — without it, every tool call that needs a workspace ID consumes one of those 30 requests. If you use a single workspace, always set this.
-    - Tools that accept an explicit `workspace_name` resolve it via `/me/workspaces`, which is cached for the lifetime of the server process — so only the first lookup in a session hits the API.
 
 ## Getting Started
 
@@ -127,14 +92,14 @@ TOGGL_EMAIL=your_toggl_email
 TOGGL_PASSWORD=your_toggl_password
 ```
 
-If you are using Toggl API tokens:
+If you are using Toggl API tokens (<https://track.toggl.com/profile>):
 
 ```bash
-TOGGL_EMAIL=api_token
-TOGGL_PASSWORD=your_api_token
+TOGGL_EMAIL=your-actual-api-token
+TOGGL_PASSWORD="api_token"
 ```
 
-Where `api_token` is the literal string Toggl expects as the email field when authenticating with a token
+Where `"api_token"` is the literal string Toggl expects as the password field when authenticating with a token
 
 **Strongly recommended:** set your workspace ID directly to avoid hitting the `/me` endpoint on every tool invocation:
 
@@ -144,80 +109,27 @@ TOGGL_WORKSPACE_ID=your_workspace_id
 
 ### Installation
 
-First install uv:
-    - For MacOS/Linux:
-        ```bash
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        ```
-    - For Windows:
-        ```bash
-        powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-        ```
+**First install uv:**
+
+- For Unix:
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+- For Windows:
+    ```bash
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    ```
 
 Make sure to restart your terminal afterwards to ensure that the uv command gets picked up.
 
 Now let's clone the repository and set up the project:
 
 ```bash
-git clone [repository-url]
+git clone https://github.com/nablabits/toggl-mcp-server
 cd toggl-mcp-server
 uv venv
 uv sync
 ```
-
-### Automated Testing
-
-Tests live in `toggl-mcp-server/tests/` and use [pytest-vcr](https://pytest-vcr.readthedocs.io/) to record and replay real Toggl API responses (cassettes), so tests run without network access after the first recording.
-
-**Creating a Sandbox Environment:**
-
-Tests rely on a dedicated Toggl sandbox account with a known set of fixtures. `tests/seed_sandbox.py` creates them in one shot:
-
-- 3 projects: `Alpha`, `Beta`, `Gamma`
-- 5 tasks spread across those projects
-- 9 time entries across the last 3 days with realistic tags
-
-To seed a fresh sandbox:
-
-1. Create a free Toggl account, copy the template, and fill in its credentials and workspace ID:
-
-```bash
-cp tests/env-test-template tests/.env-test
-```
-
-```bash
-uv sync --extra test --extra dev
-```
-
-1. Run the script:
-
-```bash
-cd toggl-mcp-server
-python tests/seed_sandbox.py
-```
-
-1. Delete any existing cassettes and re-record them:
-
-```bash
-rm tests/cassettes/*.yaml
-uv run pytest -v
-```
-
-**Run the suite:**
-
-```bash
-uv run pytest -v
-```
-
-**Adding tests for a new tool:**
-
-1. Write the test with `@pytest.mark.vcr` — on first run pytest-vcr will call the real API and save the response to `tests/cassettes/<test_name>.yaml`.
-2. Re-run: the cassette is replayed, no network needed.
-3. Always run the full suite before committing cassettes — `test_cassette_has_no_sensitive_data` will auto-scrub any `api_token` or `email` values that leaked into a cassette and fail to flag what was fixed.
-
-**Re-recording a cassette** (e.g. after an API change): delete the `.yaml` file and re-run the test with a live network connection.
-
-**Test coverage:** 100% coverage across all files (182 tests). Updated 2026-05-28.
 
 ### Integration with Development Tools
 
@@ -281,13 +193,99 @@ The Toggl MCP Server works with any MCP-compatible client. For integration steps
 
 Note: Configuration typically involves specifying the server path and environment variables similar to the VS Code setup above.
 
-### Testing with MCP Inspector
+## Technicalities
 
-To run in development:
+### Limitations
+
+- **Time entries limit:** `get_time_entries_for_range` is capped at a **90-day rolling window** by the Toggl API — dates older than ~3 months are rejected. Toggl exposes Reports endpoints for historical data, but those do not return `time_entry_id` values, so individual historical entries cannot be addressed, updated, or deleted through this MCP server.
+
+- **Throttling:**
+  - **429 Too Many Requests** — leaky bucket rate limiter (≈1 req/s per token/IP); back off for a few minutes
+  - **402 Payment Required** — sliding window quota per user per org (30 req/h on free, 240 on Starter, 600 on Premium); headers `X-Toggl-Quota-Remaining` and `X-Toggl-Quota-Resets-In` indicate remaining budget.
+  - The `/me` endpoint is subject to a hard limit of 30 requests/hour regardless of plan ([docs](https://engineering.toggl.com/docs/track/)). A couple of guardrails have been added to mitigate this limitation: 
+    - Set `TOGGL_WORKSPACE_ID` — without it, every tool call that needs a workspace ID consumes one of those 30 requests. If you use a single workspace, always set this.
+    - Tools that accept an explicit `workspace_name` resolve it via `/me/workspaces`, which is cached for the lifetime of the server process — so only the first lookup in a session hits the API.
+
+
+### Code Structure
+
+The server is organised by domain. Each module owns its low-level API helpers and the `@mcp.tool()` functions for that domain:
+
+```text
+toggl-mcp-server/
+├── toggl_mcp_server.py   # entry point — mcp.run()
+├── app.py                # FastMCP instance, auth headers, Endpoints, TOGGL_COLORS
+├── helpers/
+│   ├── http.py           # toggl_request — authenticated HTTP with rate-limit handling
+│   └── time.py           # _get_current_utc_time, _iso_timestamp, _get_date_range, …
+├── projects.py           # helpers + tools: create/delete/update/get_all_projects
+├── tasks.py              # helpers + tools: get/create/update/delete_task
+├── time_entries.py       # helpers + tools: new/stop/delete/update/get time entries
+├── tags.py               # helpers + tools: get/create/update/delete_tag
+├── clients.py            # helpers + tools: get/create/update/delete_client
+└── resources.py          # MCP resources + name→ID lookup helpers (workspace cache)
+```
+
+**Key conventions:**
+
+- `_` prefix = low-level helper (ID-based, internal). No prefix = `@mcp.tool()` (name-based, user-facing).
+- Helpers return `str` on error; callers check `isinstance(result, str)` before proceeding.
+- All HTTP calls use `httpx.AsyncClient` via `async`/`await`.
+
+### Automated Testing
+
+Tests live in `toggl-mcp-server/tests/` and use [pytest-vcr](https://pytest-vcr.readthedocs.io/) to record and replay real Toggl API responses (cassettes), so tests run without network access after the first recording.
+
+**Creating a Sandbox Environment:**
+
+Tests rely on a dedicated Toggl sandbox account with a known set of fixtures. `tests/seed_sandbox.py` creates them in one shot:
+
+- 3 projects: `Alpha`, `Beta`, `Gamma`
+- 5 tasks spread across those projects
+- 9 time entries across the last 3 days with realistic tags
+
+To seed a fresh sandbox:
+
+1. Create a free Toggl account, copy the template, and fill in its credentials and workspace ID:
 
 ```bash
-TOGGL_EMAIL=your_toggl_email TOGGL_PASSWORD=your_toggl_password mcp dev toggl_mcp_server.py
+cp tests/env-test-template tests/.env-test
 ```
+
+```bash
+uv sync --extra test --extra dev
+```
+
+1. Run the script:
+
+```bash
+cd toggl-mcp-server
+python tests/seed_sandbox.py
+```
+
+1. Delete any existing cassettes and re-record them:
+
+```bash
+rm tests/cassettes/*.yaml
+uv run pytest -v
+```
+
+**Run the suite:**
+
+```bash
+uv run pytest -v
+```
+
+**Adding tests for a new tool:**
+
+1. Write the test with `@pytest.mark.vcr` — on first run pytest-vcr will call the real API and save the response to `tests/cassettes/<test_name>.yaml`.
+2. Re-run: the cassette is replayed, no network needed.
+3. Always run the full suite before committing cassettes — `test_cassette_has_no_sensitive_data` will auto-scrub any `api_token` or `email` values that leaked into a cassette and fail to flag what was fixed.
+
+**Re-recording a cassette** (e.g. after an API change): delete the `.yaml` file and re-run the test with a live network connection.
+
+**Test coverage:** 100% coverage across all files (182 tests). Updated 2026-05-28.
+
 
 ## License
 
