@@ -66,16 +66,6 @@ async def _get_default_workspace_id() -> Union[int, str]:
     return result.get("default_workspace_id")
 
 
-async def _get_project_id_by_name(project_name: str, workspace_id: int) -> Union[int, str]:
-    projects_response = await _get_projects(workspace_id)
-    if "error" in projects_response:
-        return f"Error fetching projects: {projects_response['error']}"
-    for project in projects_response.get("projects", []):
-        if project.get("name") == project_name:
-            return project.get("id")
-    return f"Project with name '{project_name}' doesn't exist"
-
-
 async def _get_time_entry_id_by_name(time_entry_name: str, workspace_id: int) -> Union[int, str]:
     time_entries_response = await _get_time_entries()
     if "error" in time_entries_response:

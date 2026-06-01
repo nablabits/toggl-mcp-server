@@ -57,27 +57,6 @@ async def test_get_clients_workspace_not_found():
 
 
 # ---------------------------------------------------------------------------
-# Client not found
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_client_not_found():
-    result = await update_client(client_name="NonExistent Client", new_name="x")
-    assert isinstance(result, str)
-    assert result == "Client with name 'NonExistent Client' doesn't exist"
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_client_not_found():
-    result = await delete_client(client_name="NonExistent Client")
-    assert isinstance(result, str)
-    assert result == "Client with name 'NonExistent Client' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
 # Workspace not found — create / update / delete
 # ---------------------------------------------------------------------------
 
@@ -92,39 +71,27 @@ async def test_create_client_workspace_not_found():
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_update_client_workspace_not_found():
-    result = await update_client(
-        client_name="Acme", new_name="Acme2", workspace_name="NonExistentWS"
-    )
+    result = await update_client(client_id=42, new_name="Acme2", workspace_name="NonExistentWS")
     assert result == "Workspace with name 'NonExistentWS' doesn't exist"
 
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_delete_client_workspace_not_found():
-    result = await delete_client(client_name="Acme", workspace_name="NonExistentWS")
+    result = await delete_client(client_id=42, workspace_name="NonExistentWS")
     assert result == "Workspace with name 'NonExistentWS' doesn't exist"
 
 
 # ---------------------------------------------------------------------------
-# API error paths — get_client_id / delete
+# API error paths — delete
 # ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_client_id_by_name_helper_error():
-    with patch("clients.toggl_request", new_callable=AsyncMock, return_value="503 error"):
-        from clients import _get_client_id_by_name
-
-        result = await _get_client_id_by_name("Acme", 12345)
-    assert result == "Error fetching clients: 503 error"
 
 
 @pytest.mark.asyncio
 async def test_delete_client_api_error():
     with (
         patch("clients._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("clients._get_client_id_by_name", new_callable=AsyncMock, return_value=42),
         patch("clients._delete_client_helper", new_callable=AsyncMock, return_value="503 error"),
     ):
-        result = await delete_client(client_name="Acme")
-    assert result == "Failed to delete client 'Acme': 503 error"
+        result = await delete_client(client_id=42)
+    assert result == "Failed to delete client (id: 42): 503 error"

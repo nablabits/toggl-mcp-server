@@ -51,36 +51,9 @@ async def test_create_project_workspace_not_found():
 
 @pytest.mark.asyncio
 async def test_update_project_no_operations():
-    result = await update_project(project_name="Alpha")
+    result = await update_project(project_id=999)
     assert isinstance(result, str)
     assert result == "Error: No operations provided for update."
-
-
-# ---------------------------------------------------------------------------
-# Project not found
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_project_not_found():
-    result = await delete_project(project_name="NonExistent Project")
-    assert isinstance(result, str)
-    assert result == "Project with name 'NonExistent Project' doesn't exist"
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_project_not_found():
-    result = await update_project(
-        project_name="NonExistent Project",
-        operations=[{"op": "replace", "path": "/color", "value": "#bc85e6"}],
-    )
-    assert isinstance(result, str)
-    assert (
-        result
-        == "Error with project 'NonExistent Project': Project with name 'NonExistent Project' doesn't exist"
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +64,7 @@ async def test_update_project_not_found():
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_delete_project_workspace_not_found():
-    result = await delete_project(project_name="Alpha", workspace_name="NonExistentWS")
+    result = await delete_project(project_id=999, workspace_name="NonExistentWS")
     assert isinstance(result, str)
     assert result == "Workspace with name 'NonExistentWS' doesn't exist"
 
@@ -100,7 +73,7 @@ async def test_delete_project_workspace_not_found():
 @pytest.mark.vcr
 async def test_update_project_workspace_not_found():
     result = await update_project(
-        project_name="Alpha",
+        project_id=999,
         workspace_name="NonExistentWS",
         operations=[{"op": "replace", "path": "/color", "value": "#bc85e6"}],
     )
@@ -125,14 +98,13 @@ async def test_get_all_projects_workspace_not_found():
 async def test_delete_project_not_found_sentinel():
     with (
         patch("projects._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("projects._get_project_id_by_name", new_callable=AsyncMock, return_value=99999),
         patch(
             "projects._delete_project_helper",
             new_callable=AsyncMock,
             return_value="Project not found/accessible",
         ),
     ):
-        result = await delete_project(project_name="Alpha")
+        result = await delete_project(project_id=99999)
 
     assert result == "Project with project_id 99999 was not found or is inaccessible."
 
@@ -141,14 +113,13 @@ async def test_delete_project_not_found_sentinel():
 async def test_delete_project_generic_api_error():
     with (
         patch("projects._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("projects._get_project_id_by_name", new_callable=AsyncMock, return_value=99999),
         patch(
             "projects._delete_project_helper",
             new_callable=AsyncMock,
             return_value="503 Service Unavailable",
         ),
     ):
-        result = await delete_project(project_name="Alpha")
+        result = await delete_project(project_id=99999)
 
     assert result == "Failed to delete project 99999. Details: 503 Service Unavailable"
 
@@ -162,7 +133,6 @@ async def test_delete_project_generic_api_error():
 async def test_update_project_api_error():
     with (
         patch("projects._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("projects._get_project_id_by_name", new_callable=AsyncMock, return_value=99999),
         patch(
             "projects._update_projects_helper",
             new_callable=AsyncMock,
@@ -170,7 +140,7 @@ async def test_update_project_api_error():
         ),
     ):
         result = await update_project(
-            project_name="Alpha",
+            project_id=99999,
             operations=[{"op": "replace", "path": "/color", "value": "#bc85e6"}],
         )
 

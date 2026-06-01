@@ -205,14 +205,6 @@ async def test_create_time_entry_workspace_not_found():
     assert result == {"error": "Workspace with name 'NonExistentWS' doesn't exist"}
 
 
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_time_entry_project_not_found():
-    result = await create_time_entry(project_name="NonExistentProject")
-    assert isinstance(result, dict)
-    assert result == {"error": "Project with name 'NonExistentProject' doesn't exist"}
-
-
 # ---------------------------------------------------------------------------
 # delete_time_entry — entry not found
 # ---------------------------------------------------------------------------
@@ -369,9 +361,8 @@ async def test_create_time_entry_workspace_id_none(mock_helper):
 
 
 @pytest.mark.asyncio
-async def test_create_time_entry_with_project_name_found(mock_workspace, mock_helper):
-    with patch("time_entries._get_project_id_by_name", new_callable=AsyncMock, return_value=99):
-        result = await create_time_entry(project_name="Alpha")
+async def test_create_time_entry_with_project_id(mock_workspace, mock_helper):
+    result = await create_time_entry(project_id=99)
     assert "toggle_time_entry_response" in result
     assert mock_helper.call_args.kwargs["project_id"] == 99
 

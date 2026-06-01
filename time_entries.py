@@ -13,7 +13,6 @@ from helpers.time import (
 )
 from resources import (
     _get_default_workspace_id,
-    _get_project_id_by_name,
 )
 from resources import _get_time_entries_for_range as _fetch_time_entries_for_range
 from resources import (
@@ -105,7 +104,7 @@ async def _update_time_entry_helper(
 async def create_time_entry(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
-    project_name: Optional[str] = None,
+    project_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = -1,
@@ -116,13 +115,14 @@ async def create_time_entry(
     Create a Toggl Track time entry with flexible options for live or past tracking.
 
     If `workspace_name` is not provided, set it as None.
+    Use `get_all_projects` first to discover project IDs.
 
     Duration is in seconds. Set to -1 for live tracking.
 
     Args:
         description (str, optional): What the time entry is about.
         tags (List[str], optional): List of tags (names only).
-        project_name (str, optional): Name of the associated project.
+        project_id (int, optional): ID of the associated project.
         start (str, optional): ISO 8601 UTC start time.
         stop (str, optional): ISO 8601 UTC stop time.
         duration (int, optional): Duration in seconds. Set to -1 for live tracking.
@@ -141,13 +141,6 @@ async def create_time_entry(
         return {"error": workspace_id}
     if workspace_id is None:
         return {"error": "Could not determine workspace ID."}
-
-    project_id = None
-    if project_name is not None:
-        project_id_or_error = await _get_project_id_by_name(project_name, workspace_id)
-        if isinstance(project_id_or_error, str):
-            return {"error": project_id_or_error}
-        project_id = project_id_or_error
 
     final_start_for_api = start
     final_stop_for_api = stop

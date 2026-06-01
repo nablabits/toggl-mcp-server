@@ -35,16 +35,6 @@ async def _delete_client_helper(workspace_id: int, client_id: int) -> Union[int,
     return await toggl_request("delete", Endpoints(workspace_id).client(client_id))
 
 
-async def _get_client_id_by_name(client_name: str, workspace_id: int) -> Union[int, str]:
-    clients = await _get_clients_helper(workspace_id)
-    if isinstance(clients, str):
-        return f"Error fetching clients: {clients}"
-    for c in clients:
-        if c.get("name") == client_name:
-            return c.get("id")
-    return f"Client with name '{client_name}' doesn't exist"
-
-
 @mcp.tool()
 async def get_clients(
     workspace_name: Optional[str] = None,
@@ -105,18 +95,19 @@ async def create_client(
 
 @mcp.tool()
 async def update_client(
-    client_name: str,
+    client_id: int,
     new_name: Optional[str] = None,
     notes: Optional[str] = None,
     workspace_name: Optional[str] = None,
 ) -> Union[dict, str]:
     """
-    Update an existing client by name.
+    Update an existing client by ID.
 
     If `workspace_name` is not provided, set it as None.
+    Use `get_clients` first to discover client IDs.
 
     Args:
-        client_name (str): Current name of the client to update.
+        client_id (int): ID of the client to update.
         new_name (str, optional): New name for the client.
         notes (str, optional): Updated notes.
         workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
@@ -132,24 +123,22 @@ async def update_client(
     )
     if isinstance(workspace_id, str):
         return workspace_id
-    client_id = await _get_client_id_by_name(client_name, workspace_id)
-    if isinstance(client_id, str):
-        return client_id
     return await _update_client_helper(workspace_id, client_id, name=new_name, notes=notes)
 
 
 @mcp.tool()
 async def delete_client(
-    client_name: str,
+    client_id: int,
     workspace_name: Optional[str] = None,
 ) -> str:
     """
-    Delete a client by name.
+    Delete a client by ID.
 
     If `workspace_name` is not provided, set it as None.
+    Use `get_clients` first to discover client IDs.
 
     Args:
-        client_name (str): Name of the client to delete.
+        client_id (int): ID of the client to delete.
         workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
 
     Returns:
@@ -162,10 +151,7 @@ async def delete_client(
     )
     if isinstance(workspace_id, str):
         return workspace_id
-    client_id = await _get_client_id_by_name(client_name, workspace_id)
-    if isinstance(client_id, str):
-        return client_id
     status = await _delete_client_helper(workspace_id, client_id)
     if isinstance(status, int):
-        return f"Successfully deleted client '{client_name}' (id: {client_id})"
-    return f"Failed to delete client '{client_name}': {status}"
+        return f"Successfully deleted client (id: {client_id})"
+    return f"Failed to delete client (id: {client_id}): {status}"

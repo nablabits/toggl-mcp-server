@@ -56,9 +56,11 @@ async def test_project_lifecycle(vcr):
     assert result["active"] is True
     assert "id" in result
 
+    project_id = result["id"]
+
     # --- Update ---
     updated = await update_project(
-        project_name="Delta",
+        project_id=project_id,
         operations=[{"op": "replace", "path": "/color", "value": "#bc2d07"}],
     )
 
@@ -67,7 +69,7 @@ async def test_project_lifecycle(vcr):
     assert len(successes) >= 1
 
     # --- Delete ---
-    deleted = await delete_project(project_name="Delta")
+    deleted = await delete_project(project_id=project_id)
 
     assert isinstance(deleted, str)
     assert "Successfully" in deleted
@@ -124,16 +126,25 @@ async def test_time_entry_lifecycle(vcr):
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_task_lifecycle(vcr):
+    # --- Resolve project ---
+    from toggl_mcp_server import get_all_projects
+
+    projects_resp = await get_all_projects()
+    alpha = next(p for p in projects_resp["projects"] if p["name"] == "Alpha")
+    project_id = alpha["id"]
+
     # --- Create ---
-    result = await create_task(name="Lifecycle task", project_name="Alpha")
+    result = await create_task(name="Lifecycle task", project_id=project_id)
 
     assert isinstance(result, dict), f"Expected dict, got: {result}"
     assert result["name"] == "Lifecycle task"
     assert result["active"] is True
     assert "id" in result
 
+    task_id = result["id"]
+
     # --- Read (verify it appears in listing) ---
-    tasks = await get_tasks(project_name="Alpha")
+    tasks = await get_tasks(project_id=project_id)
 
     assert isinstance(tasks, list), f"Expected list, got: {tasks}"
     names = {t["name"] for t in tasks}
@@ -141,8 +152,8 @@ async def test_task_lifecycle(vcr):
 
     # --- Update ---
     updated = await update_task(
-        task_name="Lifecycle task",
-        project_name="Alpha",
+        task_id=task_id,
+        project_id=project_id,
         name="Lifecycle task (updated)",
     )
 
@@ -150,7 +161,7 @@ async def test_task_lifecycle(vcr):
     assert updated["name"] == "Lifecycle task (updated)"
 
     # --- Delete ---
-    deleted = await delete_task(task_name="Lifecycle task (updated)", project_name="Alpha")
+    deleted = await delete_task(task_id=task_id, project_id=project_id)
 
     assert isinstance(deleted, str)
     assert "Successfully" in deleted
@@ -171,6 +182,8 @@ async def test_tag_lifecycle(vcr):
     assert result["name"] == "lifecycle-tag"
     assert "id" in result
 
+    tag_id = result["id"]
+
     # --- Read (verify it appears in listing) ---
     tags = await get_tags()
 
@@ -179,13 +192,13 @@ async def test_tag_lifecycle(vcr):
     assert "lifecycle-tag" in names
 
     # --- Update ---
-    updated = await update_tag(tag_name="lifecycle-tag", new_name="lifecycle-tag-updated")
+    updated = await update_tag(tag_id=tag_id, new_name="lifecycle-tag-updated")
 
     assert isinstance(updated, dict), f"Expected dict, got: {updated}"
     assert updated["name"] == "lifecycle-tag-updated"
 
     # --- Delete ---
-    deleted = await delete_tag(tag_name="lifecycle-tag-updated")
+    deleted = await delete_tag(tag_id=tag_id)
 
     assert isinstance(deleted, str)
     assert "Successfully" in deleted
@@ -206,6 +219,8 @@ async def test_client_lifecycle(vcr):
     assert result["name"] == "Lifecycle client"
     assert "id" in result
 
+    client_id = result["id"]
+
     # --- Read (verify it appears in listing) ---
     clients = await get_clients()
 
@@ -214,15 +229,13 @@ async def test_client_lifecycle(vcr):
     assert "Lifecycle client" in names
 
     # --- Update ---
-    updated = await update_client(
-        client_name="Lifecycle client", new_name="Lifecycle client (updated)"
-    )
+    updated = await update_client(client_id=client_id, new_name="Lifecycle client (updated)")
 
     assert isinstance(updated, dict), f"Expected dict, got: {updated}"
     assert updated["name"] == "Lifecycle client (updated)"
 
     # --- Delete ---
-    deleted = await delete_client(client_name="Lifecycle client (updated)")
+    deleted = await delete_client(client_id=client_id)
 
     assert isinstance(deleted, str)
     assert "Successfully" in deleted
