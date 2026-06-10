@@ -32,19 +32,6 @@ async def test_get_all_projects_unauthorized(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# Workspace not found
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_project_workspace_not_found():
-    result = await create_project(name="My Project", workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
 # No operations
 # ---------------------------------------------------------------------------
 
@@ -57,36 +44,49 @@ async def test_update_project_no_operations():
 
 
 # ---------------------------------------------------------------------------
-# Workspace not found — delete / update / get_all
+# Workspace error propagation — create / delete / update / get_all
 # ---------------------------------------------------------------------------
 
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_project_workspace_not_found():
-    result = await delete_project(project_id=999, workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+_WS_ERROR = "Failed to fetch default workspace ID: 503 error"
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_project_workspace_not_found():
-    result = await update_project(
-        project_id=999,
-        workspace_name="NonExistentWS",
-        operations=[{"op": "replace", "path": "/color", "value": "#bc85e6"}],
-    )
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_create_project_workspace_error():
+    with patch(
+        "projects._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await create_project(name="My Project")
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_get_all_projects_workspace_not_found():
-    result = await get_all_projects(workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_delete_project_workspace_error():
+    with patch(
+        "projects._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await delete_project(project_id=999)
+    assert result == _WS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_update_project_workspace_error():
+    with patch(
+        "projects._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await update_project(
+            project_id=999,
+            operations=[{"op": "replace", "path": "/color", "value": "#bc85e6"}],
+        )
+    assert result == _WS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_get_all_projects_workspace_error():
+    with patch(
+        "projects._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await get_all_projects()
+    assert result == _WS_ERROR
 
 
 # ---------------------------------------------------------------------------

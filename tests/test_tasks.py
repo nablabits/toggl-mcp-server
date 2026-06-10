@@ -10,42 +10,38 @@ import app as server
 from tasks import create_task, delete_task, get_tasks, update_task
 
 # ---------------------------------------------------------------------------
-# Workspace not found
+# Workspace error propagation — get / create / update / delete
 # ---------------------------------------------------------------------------
 
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_get_tasks_workspace_not_found():
-    result = await get_tasks(project_id=99, workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
-# Workspace not found — create / update / delete
-# ---------------------------------------------------------------------------
+_WS_ERROR = "Failed to fetch default workspace ID: 503 error"
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_task_workspace_not_found():
-    result = await create_task(name="My Task", project_id=99, workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_get_tasks_workspace_error():
+    with patch("tasks._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await get_tasks(project_id=99)
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_task_workspace_not_found():
-    result = await update_task(task_id=42, project_id=99, workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_create_task_workspace_error():
+    with patch("tasks._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await create_task(name="My Task", project_id=99)
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_task_workspace_not_found():
-    result = await delete_task(task_id=42, project_id=99, workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_update_task_workspace_error():
+    with patch("tasks._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await update_task(task_id=42, project_id=99)
+    assert result == _WS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_delete_task_workspace_error():
+    with patch("tasks._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await delete_task(task_id=42, project_id=99)
+    assert result == _WS_ERROR
 
 
 # ---------------------------------------------------------------------------

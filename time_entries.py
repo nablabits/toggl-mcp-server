@@ -11,13 +11,8 @@ from helpers.time import (
     _get_date_range,
     _iso_timestamp,
 )
-from resources import (
-    _get_default_workspace_id,
-)
+from resources import _get_default_workspace_id
 from resources import _get_time_entries_for_range as _fetch_time_entries_for_range
-from resources import (
-    _get_workspace_id_by_name,
-)
 
 
 async def _new_time_entry_helper(
@@ -108,12 +103,11 @@ async def create_time_entry(
     stop: Optional[str] = None,
     duration: Optional[int] = -1,
     billable: Optional[bool] = False,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
 ) -> dict:
     """
     Create a Toggl Track time entry with flexible options for live or past tracking.
 
-    If `workspace_name` is not provided, set it as None.
     Use `get_all_projects` first to discover project IDs.
 
     Duration is in seconds. Set to -1 for live tracking.
@@ -126,16 +120,14 @@ async def create_time_entry(
         stop (str, optional): ISO 8601 UTC stop time.
         duration (int, optional): Duration in seconds. Set to -1 for live tracking.
         billable (bool, optional): Whether this is billable time.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         dict: Toggl API response on success, or error dict on failure.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return {"error": workspace_id}
     if workspace_id is None:
@@ -240,28 +232,24 @@ async def create_time_entry(
 @mcp.tool()
 async def stop_time_entry(
     entry_id: int,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
 ) -> Union[dict, str]:
     """
     Stop a currently running time entry.
 
     Use `get_current_time_entry` to find the entry_id of the running entry.
 
-    If `workspace_name` is not provided, set it as None.
-
     Args:
         entry_id (int): Exact ID of the time entry to stop.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         dict: JSON response from the Toggl API if successful.
         str: Error message on failure.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
@@ -271,27 +259,23 @@ async def stop_time_entry(
 @mcp.tool()
 async def delete_time_entry(
     entry_id: int,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
 ) -> str:
     """
     Deletes a time entry.
 
     Use `get_time_entries_for_range` to find the entry_id first.
 
-    If `workspace_name` is not provided, set it as None.
-
     Args:
         entry_id (int): Exact ID of the time entry to delete.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         str: Success or error message.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
@@ -318,7 +302,7 @@ async def get_current_time_entry() -> Union[dict, str]:
 @mcp.tool()
 async def update_time_entry(
     entry_id: int,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
@@ -332,11 +316,10 @@ async def update_time_entry(
 
     Use `get_time_entries_for_range` to find the entry_id first.
 
-    If `workspace_name` is not provided, set it as None.
-
     Args:
         entry_id (int): Exact ID of the time entry to update.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
         description (str, optional): New description.
         tags (List[str], optional): New list of tags.
         project_id (int, optional): New project ID.
@@ -349,11 +332,8 @@ async def update_time_entry(
         dict: JSON response from Toggl if update is successful.
         str: Error message on failure.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 

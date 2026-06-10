@@ -64,13 +64,3 @@ async def _get_default_workspace_id() -> Union[int, str]:
     if isinstance(result, str):
         return f"Failed to fetch default workspace ID: {result}"
     return result.get("default_workspace_id")
-
-
-async def _get_workspace_id_by_name(workspace_name: str) -> Union[int, str]:
-    workspaces_response = await _get_workspaces()
-    if isinstance(workspaces_response, dict) and "error" in workspaces_response:
-        return f"Error fetching workspaces: {workspaces_response['error']}"
-    for workspace in workspaces_response:
-        if workspace.get("name") == workspace_name:
-            return workspace.get("id")
-    return f"Workspace with name '{workspace_name}' doesn't exist"

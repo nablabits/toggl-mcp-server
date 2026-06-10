@@ -44,43 +44,38 @@ async def test_get_tags_forbidden(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# Workspace not found
+# Workspace error propagation — get / create / update / delete
 # ---------------------------------------------------------------------------
+
+_WS_ERROR = "Failed to fetch default workspace ID: 503 error"
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_get_tags_workspace_not_found():
-    result = await get_tags(workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-# Workspace not found — create / update / delete
-# ---------------------------------------------------------------------------
+async def test_get_tags_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await get_tags()
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_tag_workspace_not_found():
-    result = await create_tag(name="my-tag", workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_create_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await create_tag(name="my-tag")
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_tag_workspace_not_found():
-    result = await update_tag(tag_id=42, new_name="dev2", workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_update_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await update_tag(tag_id=42, new_name="dev2")
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_tag_workspace_not_found():
-    result = await delete_tag(tag_id=42, workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
+async def test_delete_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await delete_tag(tag_id=42)
+    assert result == _WS_ERROR
 
 
 # ---------------------------------------------------------------------------

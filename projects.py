@@ -5,7 +5,6 @@ from helpers.http import toggl_request
 from resources import (
     _get_default_workspace_id,
     _get_projects,
-    _get_workspace_id_by_name,
 )
 
 
@@ -61,7 +60,7 @@ async def _update_projects_helper(
 @mcp.tool()
 async def create_project(
     name: str,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
     active: Optional[bool] = True,
     billable: Optional[bool] = False,
     client_id: Optional[int] = None,
@@ -76,13 +75,12 @@ async def create_project(
     """
     Creates a new project in a Toggl workspace.
 
-    If `workspace_name` is not provided, set it as None.
-
     If color is not in TOGGL_COLORS, choose the closest color from TOGGL_COLORS.
 
     Args:
         name (str): Name of the project to create.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
         active (bool, optional): Whether project is active. Defaults to True.
         billable (bool, optional): Whether project is billable. Defaults to False.
         client_id (int, optional): Associated client ID.
@@ -98,11 +96,8 @@ async def create_project(
         dict: Project data on success.
         str: Error message on failure.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
@@ -126,25 +121,22 @@ async def create_project(
 
 
 @mcp.tool()
-async def delete_project(project_id: int, workspace_name: Optional[str] = None) -> str:
+async def delete_project(project_id: int, workspace_id: Optional[int] = None) -> str:
     """
     Deletes a Toggl project by its ID.
 
-    If `workspace_name` is not provided, set it as None.
     Use `get_all_projects` first to discover project IDs.
 
     Args:
         project_id (int): The ID of the project to delete.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         str: Success or error message.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
@@ -159,18 +151,18 @@ async def delete_project(project_id: int, workspace_name: Optional[str] = None) 
 @mcp.tool()
 async def update_project(
     project_id: int,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
     operations: Optional[List[Any]] = None,
 ) -> Union[dict, str]:
     """
     Update a project using JSON Patch operations (RFC 6902).
 
-    If `workspace_name` is not provided, set it as None.
     Use `get_all_projects` first to discover project IDs.
 
     Args:
         project_id (int): ID of the project to update.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
         operations (List[Any], optional): List of patch operations with op, path, value keys.
 
     Returns:
@@ -180,11 +172,8 @@ async def update_project(
     if operations is None:
         return "Error: No operations provided for update."
 
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
@@ -197,24 +186,20 @@ async def update_project(
 
 
 @mcp.tool()
-async def get_all_projects(workspace_name: Optional[str] = None) -> Union[dict, str]:
+async def get_all_projects(workspace_id: Optional[int] = None) -> Union[dict, str]:
     """
     Retrieve all projects in the user's Toggl workspace.
 
-    If `workspace_name` is not provided, the default workspace will be used.
-
     Args:
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         dict: JSON response containing all projects.
         str: Error message if the request fails.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 

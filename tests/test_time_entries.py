@@ -183,11 +183,13 @@ async def test_get_current_time_entry():
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_time_entry_workspace_not_found():
-    result = await create_time_entry(workspace_name="NonExistentWS")
-    assert isinstance(result, dict)
-    assert result == {"error": "Workspace with name 'NonExistentWS' doesn't exist"}
+async def test_create_time_entry_workspace_error():
+    _WS_ERROR = "Failed to fetch default workspace ID: 503 error"
+    with patch(
+        "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await create_time_entry()
+    assert result == {"error": _WS_ERROR}
 
 
 # ---------------------------------------------------------------------------
@@ -426,37 +428,34 @@ async def test_create_time_entry_helper_returns_unexpected_format(mock_workspace
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_stop_time_entry_workspace_not_found():
-    with patch(
-        "time_entries._get_workspace_id_by_name",
-        new_callable=AsyncMock,
-        return_value="Workspace with name 'BadWS' doesn't exist",
-    ):
-        result = await stop_time_entry(entry_id=99, workspace_name="BadWS")
-    assert result == "Workspace with name 'BadWS' doesn't exist"
+_WS_ERROR = "Failed to fetch default workspace ID: 503 error"
 
 
 @pytest.mark.asyncio
-async def test_delete_time_entry_workspace_not_found():
+async def test_stop_time_entry_workspace_error():
     with patch(
-        "time_entries._get_workspace_id_by_name",
-        new_callable=AsyncMock,
-        return_value="Workspace with name 'BadWS' doesn't exist",
+        "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
     ):
-        result = await delete_time_entry(entry_id=99, workspace_name="BadWS")
-    assert result == "Workspace with name 'BadWS' doesn't exist"
+        result = await stop_time_entry(entry_id=99)
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-async def test_update_time_entry_workspace_not_found():
+async def test_delete_time_entry_workspace_error():
     with patch(
-        "time_entries._get_workspace_id_by_name",
-        new_callable=AsyncMock,
-        return_value="Workspace with name 'BadWS' doesn't exist",
+        "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
     ):
-        result = await update_time_entry(entry_id=99, workspace_name="BadWS")
-    assert result == "Workspace with name 'BadWS' doesn't exist"
+        result = await delete_time_entry(entry_id=99)
+    assert result == _WS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_update_time_entry_workspace_error():
+    with patch(
+        "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR
+    ):
+        result = await update_time_entry(entry_id=99)
+    assert result == _WS_ERROR
 
 
 # ---------------------------------------------------------------------------
