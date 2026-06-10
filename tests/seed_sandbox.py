@@ -40,6 +40,10 @@ PROJECTS = [
     {"name": "Gamma", "color": "#f68d38"},
 ]
 
+ARCHIVED_PROJECTS = [
+    {"name": "Archived sample project", "color": "#c9806b"},
+]
+
 # Tasks: (name, project_name)
 TASKS = [
     ("Research", "Alpha"),
@@ -67,15 +71,18 @@ def _iso(dt: datetime.datetime) -> str:
     return dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
-async def create_project(client: httpx.AsyncClient, name: str, color: str) -> int:
+async def create_project(
+    client: httpx.AsyncClient, name: str, color: str, active: bool = True
+) -> int:
     resp = await client.post(
         f"{BASE_URL}/workspaces/{WORKSPACE_ID}/projects",
-        json={"name": name, "color": color, "is_private": True, "active": True},
+        json={"name": name, "color": color, "is_private": True, "active": active},
         headers=HEADERS,
     )
     resp.raise_for_status()
     project_id = resp.json()["id"]
-    print(f"  Created project '{name}' (id={project_id})")
+    status = "active" if active else "archived"
+    print(f"  Created {status} project '{name}' (id={project_id})")
     return project_id
 
 
@@ -134,6 +141,8 @@ async def main() -> None:
         project_ids = {}
         for p in PROJECTS:
             project_ids[p["name"]] = await create_project(client, p["name"], p["color"])
+        for p in ARCHIVED_PROJECTS:
+            await create_project(client, p["name"], p["color"], active=False)
 
         print("\nCreating tasks...")
         for task_name, project_name in TASKS:

@@ -1,0 +1,69 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Host:
+      - api.track.toggl.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects?page=1&per_page=200&active=false
+  response:
+    body:
+      string: '[{"id":220307293,"workspace_id":21407567,"client_id":null,"name":"Archived
+        sample project","is_private":true,"active":false,"at":"2026-06-10T09:23:02+00:00","created_at":"2026-06-10T09:22:10+00:00","server_deleted_at":null,"color":"#bf7000","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":"USD","recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":null,"actual_seconds":null,"total_count":1,"client_name":null,"can_track_time":true,"start_date":"2026-06-10","status":"archived","wid":21407567,"cid":null,"pinned":false}]'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
+      Content-Length:
+      - '668'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 10 Jun 2026 09:25:31 GMT
+      Instance:
+      - track-public-api-proxy-57c75f56b6-k2cmx
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Page:
+      - '1'
+      X-Page-Size:
+      - '200'
+      X-Request-ID:
+      - 783da0d870dc4bc422ead7b83aba151f
+      X-Service-Level:
+      - GREEN
+      X-Sort-Field:
+      - project_name
+      X-Sort-Order:
+      - asc
+      X-Toggl-Quota-Remaining:
+      - '578'
+      X-Toggl-Quota-Resets-In:
+      - '1893'
+      X-We-are-hiring:
+      - https://toggl.com/jobs/
+    status:
+      code: 200
+      message: OK
+version: 1

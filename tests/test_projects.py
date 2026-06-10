@@ -7,7 +7,13 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import app as server
-from projects import create_project, delete_project, get_all_projects, get_project_by_id, update_project
+from projects import (
+    create_project,
+    delete_project,
+    get_all_projects,
+    get_project_by_id,
+    update_project,
+)
 
 # ---------------------------------------------------------------------------
 # API error codes
@@ -157,7 +163,7 @@ async def test_get_all_projects_error_in_response():
     with (
         patch("projects._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
         patch(
-            "projects._get_projects",
+            "projects._fetch_projects",
             new_callable=AsyncMock,
             return_value={"error": "upstream failure"},
         ),
@@ -171,7 +177,9 @@ async def test_get_all_projects_error_in_response():
 async def test_get_all_projects_unexpected_format():
     with (
         patch("projects._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("projects._get_projects", new_callable=AsyncMock, return_value=["not", "a", "dict"]),
+        patch(
+            "projects._fetch_projects", new_callable=AsyncMock, return_value=["not", "a", "dict"]
+        ),
     ):
         result = await get_all_projects()
 

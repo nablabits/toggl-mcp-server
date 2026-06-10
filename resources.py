@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from app import Endpoints, mcp
 from helpers.http import toggl_request
@@ -7,13 +7,40 @@ from helpers.http import toggl_request
 _workspaces_cache: Optional[List[dict]] = None
 
 
+async def _fetch_projects(
+    workspace_id: int,
+    active: Union[bool, Literal["both"]] = True,
+) -> dict:
+    """Paginate through all projects in a workspace.
+
+    active=True (default) returns only active projects; False returns only
+    inactive ones; "both" returns all regardless of status.
+    """
+    active_param = "both" if active == "both" else ("true" if active else "false")
+    all_projects: list = []
+    page = 1
+    per_page = 200
+    while True:
+        result = await toggl_request(
+            "get",
+            Endpoints(workspace_id).projects,
+            params={"page": page, "per_page": per_page, "active": active_param},
+        )
+        if isinstance(result, str):
+            return {"error": result}
+        if not result:
+            break
+        all_projects.extend(result)
+        if len(result) < per_page:
+            break
+        page += 1
+    return {"projects": all_projects}
+
+
 @mcp.resource("toggl:://entities/{workspace_id}/projects")
 async def _get_projects(workspace_id: int) -> dict:
-    """Retrieve all projects in a workspace."""
-    result = await toggl_request("get", Endpoints(workspace_id).projects)
-    if isinstance(result, str):
-        return {"error": result}
-    return {"projects": result}
+    """Retrieve active projects in a workspace (MCP resource, active only)."""
+    return await _fetch_projects(workspace_id, active=True)
 
 
 @mcp.resource("toggl:://me/time_entries")
