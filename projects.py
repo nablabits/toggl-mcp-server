@@ -186,6 +186,33 @@ async def update_project(
 
 
 @mcp.tool()
+async def get_project_by_id(
+    project_id: int, workspace_id: Optional[int] = None
+) -> Union[dict, str]:
+    """
+    Retrieve a single Toggl project by its ID.
+
+    Args:
+        project_id (int): The ID of the project to retrieve.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
+
+    Returns:
+        dict: Project data on success.
+        str: Error message on failure.
+    """
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
+    if isinstance(workspace_id, str):
+        return workspace_id
+
+    response = await toggl_request("get", Endpoints(workspace_id).project(project_id))
+    if isinstance(response, str):
+        return f"Failed to fetch project {project_id}: {response}"
+    return response
+
+
+@mcp.tool()
 async def get_all_projects(workspace_id: Optional[int] = None) -> Union[dict, str]:
     """
     Retrieve all projects in the user's Toggl workspace.
