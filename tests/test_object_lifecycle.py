@@ -102,7 +102,7 @@ async def test_time_entry_lifecycle(vcr):
 
     # --- Update ---
     updated = await update_time_entry(
-        time_entry_name="Lifecycle test entry",
+        entry_id=entry["id"],
         description="Lifecycle test entry (updated)",
         tags=["dev"],
     )
@@ -112,7 +112,7 @@ async def test_time_entry_lifecycle(vcr):
     assert "dev" in updated.get("tags", [])
 
     # --- Delete ---
-    deleted = await delete_time_entry(time_entry_name="Lifecycle test entry (updated)")
+    deleted = await delete_time_entry(entry_id=entry["id"])
 
     assert isinstance(deleted, str)
     assert "Successfully" in deleted

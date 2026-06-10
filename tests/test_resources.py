@@ -10,7 +10,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import resources
 from resources import (
     _get_default_workspace_id,
-    _get_time_entry_id_by_name,
     _get_workspace_id_by_name,
 )
 from toggl_mcp_server import _get_projects, _get_time_entries, _get_workspaces, get_tasks
@@ -124,22 +123,6 @@ async def test_get_default_workspace_id_api_error(monkeypatch):
     with patch("resources.toggl_request", new_callable=AsyncMock, return_value="503 error"):
         result = await _get_default_workspace_id()
     assert result == "Failed to fetch default workspace ID: 503 error"
-
-
-# ---------------------------------------------------------------------------
-# _get_time_entry_id_by_name — _get_time_entries returns an error
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_time_entry_id_by_name_entries_error():
-    with patch(
-        "resources._get_time_entries",
-        new_callable=AsyncMock,
-        return_value={"error": "upstream failure"},
-    ):
-        result = await _get_time_entry_id_by_name("My entry", 12345)
-    assert result == "Error fetching time_entries: upstream failure"
 
 
 # ---------------------------------------------------------------------------

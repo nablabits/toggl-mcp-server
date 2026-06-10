@@ -16,7 +16,6 @@ from resources import (
 )
 from resources import _get_time_entries_for_range as _fetch_time_entries_for_range
 from resources import (
-    _get_time_entry_id_by_name,
     _get_workspace_id_by_name,
 )
 
@@ -240,30 +239,24 @@ async def create_time_entry(
 
 @mcp.tool()
 async def stop_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
+    entry_id: int,
     workspace_name: Optional[str] = None,
 ) -> Union[dict, str]:
     """
     Stop a currently running time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
+    Use `get_current_time_entry` to find the entry_id of the running entry.
 
     If `workspace_name` is not provided, set it as None.
 
     Args:
-        time_entry_name (str, optional): Description of the running time entry to stop.
-        entry_id (int, optional): Exact ID of the time entry to stop.
+        entry_id (int): Exact ID of the time entry to stop.
         workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
 
     Returns:
         dict: JSON response from the Toggl API if successful.
         str: Error message on failure.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
     workspace_id = (
         await _get_default_workspace_id()
         if workspace_name is None
@@ -272,41 +265,28 @@ async def stop_time_entry(
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
-    return await _stopping_time_entry_helper(time_entry_id, workspace_id)
+    return await _stopping_time_entry_helper(entry_id, workspace_id)
 
 
 @mcp.tool()
 async def delete_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
+    entry_id: int,
     workspace_name: Optional[str] = None,
 ) -> str:
     """
     Deletes a time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
+    Use `get_time_entries_for_range` to find the entry_id first.
 
     If `workspace_name` is not provided, set it as None.
 
     Args:
-        time_entry_name (str, optional): Description of the time entry to delete.
-        entry_id (int, optional): Exact ID of the time entry to delete.
+        entry_id (int): Exact ID of the time entry to delete.
         workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
 
     Returns:
         str: Success or error message.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
     workspace_id = (
         await _get_default_workspace_id()
         if workspace_name is None
@@ -315,19 +295,12 @@ async def delete_time_entry(
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
-    delete_status = await _deleting_time_entry_helper(time_entry_id, workspace_id)
+    delete_status = await _deleting_time_entry_helper(entry_id, workspace_id)
     if isinstance(delete_status, int):
-        return f"Successfully deleted the time entry with time_entry_id: {time_entry_id}"
+        return f"Successfully deleted the time entry with time_entry_id: {entry_id}"
     elif delete_status == "Time Entry not found/accessible":
-        return f"Time entry with time_entry_id {time_entry_id} was not found or is inaccessible."
-    return f"Failed to delete time_entry {time_entry_id}. Details: {delete_status}"
+        return f"Time entry with time_entry_id {entry_id} was not found or is inaccessible."
+    return f"Failed to delete time_entry {entry_id}. Details: {delete_status}"
 
 
 @mcp.tool()
@@ -344,8 +317,7 @@ async def get_current_time_entry() -> Union[dict, str]:
 
 @mcp.tool()
 async def update_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
+    entry_id: int,
     workspace_name: Optional[str] = None,
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
@@ -358,14 +330,12 @@ async def update_time_entry(
     """
     Update one or more attributes of an existing time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
+    Use `get_time_entries_for_range` to find the entry_id first.
 
     If `workspace_name` is not provided, set it as None.
 
     Args:
-        time_entry_name (str, optional): Description of the time entry to update.
-        entry_id (int, optional): Exact ID of the time entry to update.
+        entry_id (int): Exact ID of the time entry to update.
         workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
         description (str, optional): New description.
         tags (List[str], optional): New list of tags.
@@ -379,9 +349,6 @@ async def update_time_entry(
         dict: JSON response from Toggl if update is successful.
         str: Error message on failure.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
     workspace_id = (
         await _get_default_workspace_id()
         if workspace_name is None
@@ -390,15 +357,8 @@ async def update_time_entry(
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
     return await _update_time_entry_helper(
-        time_entry_id=time_entry_id,
+        time_entry_id=entry_id,
         workspace_id=workspace_id,
         description=description,
         tags=tags,

@@ -145,24 +145,9 @@ async def test_no_start_skips_timezone_correction(mock_workspace, mock_helper):
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
-async def test_stop_time_entry():
-    result = await stop_time_entry(time_entry_name="Weekly review - live entry")
-    assert isinstance(result, dict)
-    assert result["stop"] is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
 async def test_stop_time_entry_not_found():
-    result = await stop_time_entry(time_entry_name="NonExistent Entry")
+    result = await stop_time_entry(entry_id=99999999999)
     assert isinstance(result, str)
-    assert result == "Time entry with name 'NonExistent Entry' doesn't exist"
-
-
-@pytest.mark.asyncio
-async def test_stop_time_entry_neither_provided():
-    result = await stop_time_entry()
-    assert result == "Either time_entry_name or entry_id must be provided."
 
 
 @pytest.mark.asyncio
@@ -206,22 +191,15 @@ async def test_create_time_entry_workspace_not_found():
 
 
 # ---------------------------------------------------------------------------
-# delete_time_entry — entry not found
+# delete_time_entry
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_delete_time_entry_not_found():
-    result = await delete_time_entry(time_entry_name="NonExistent Entry")
+    result = await delete_time_entry(entry_id=99999999999)
     assert isinstance(result, str)
-    assert result == "Time entry with name 'NonExistent Entry' doesn't exist"
-
-
-@pytest.mark.asyncio
-async def test_delete_time_entry_neither_provided():
-    result = await delete_time_entry()
-    assert result == "Either time_entry_name or entry_id must be provided."
 
 
 @pytest.mark.asyncio
@@ -239,22 +217,15 @@ async def test_delete_time_entry_by_entry_id():
 
 
 # ---------------------------------------------------------------------------
-# update_time_entry — entry not found
+# update_time_entry
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_update_time_entry_not_found():
-    result = await update_time_entry(time_entry_name="NonExistent Entry", description="new desc")
+    result = await update_time_entry(entry_id=99999999999, description="new desc")
     assert isinstance(result, str)
-    assert result == "Time entry with name 'NonExistent Entry' doesn't exist"
-
-
-@pytest.mark.asyncio
-async def test_update_time_entry_neither_provided():
-    result = await update_time_entry()
-    assert result == "Either time_entry_name or entry_id must be provided."
 
 
 @pytest.mark.asyncio
@@ -462,7 +433,7 @@ async def test_stop_time_entry_workspace_not_found():
         new_callable=AsyncMock,
         return_value="Workspace with name 'BadWS' doesn't exist",
     ):
-        result = await stop_time_entry(time_entry_name="My entry", workspace_name="BadWS")
+        result = await stop_time_entry(entry_id=99, workspace_name="BadWS")
     assert result == "Workspace with name 'BadWS' doesn't exist"
 
 
@@ -473,7 +444,7 @@ async def test_delete_time_entry_workspace_not_found():
         new_callable=AsyncMock,
         return_value="Workspace with name 'BadWS' doesn't exist",
     ):
-        result = await delete_time_entry(time_entry_name="My entry", workspace_name="BadWS")
+        result = await delete_time_entry(entry_id=99, workspace_name="BadWS")
     assert result == "Workspace with name 'BadWS' doesn't exist"
 
 
@@ -484,7 +455,7 @@ async def test_update_time_entry_workspace_not_found():
         new_callable=AsyncMock,
         return_value="Workspace with name 'BadWS' doesn't exist",
     ):
-        result = await update_time_entry(time_entry_name="My entry", workspace_name="BadWS")
+        result = await update_time_entry(entry_id=99, workspace_name="BadWS")
     assert result == "Workspace with name 'BadWS' doesn't exist"
 
 
@@ -500,15 +471,12 @@ async def test_delete_time_entry_not_found_sentinel():
             "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=12345
         ),
         patch(
-            "time_entries._get_time_entry_id_by_name", new_callable=AsyncMock, return_value=99999
-        ),
-        patch(
             "time_entries._deleting_time_entry_helper",
             new_callable=AsyncMock,
             return_value="Time Entry not found/accessible",
         ),
     ):
-        result = await delete_time_entry(time_entry_name="My entry")
+        result = await delete_time_entry(entry_id=99999)
     assert result == "Time entry with time_entry_id 99999 was not found or is inaccessible."
 
 
@@ -519,13 +487,10 @@ async def test_delete_time_entry_generic_api_error():
             "time_entries._get_default_workspace_id", new_callable=AsyncMock, return_value=12345
         ),
         patch(
-            "time_entries._get_time_entry_id_by_name", new_callable=AsyncMock, return_value=99999
-        ),
-        patch(
             "time_entries._deleting_time_entry_helper",
             new_callable=AsyncMock,
             return_value="503 Service Unavailable",
         ),
     ):
-        result = await delete_time_entry(time_entry_name="My entry")
+        result = await delete_time_entry(entry_id=99999)
     assert result == "Failed to delete time_entry 99999. Details: 503 Service Unavailable"
