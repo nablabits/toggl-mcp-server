@@ -8,39 +8,32 @@ interactions:
       - gzip, deflate
       Connection:
       - keep-alive
+      Content-Length:
+      - '0'
       Content-Type:
       - application/json
       Host:
       - api.track.toggl.com
       User-Agent:
       - python-httpx/0.28.1
-    method: GET
-    uri: https://api.track.toggl.com/api/v9/me/time_entries
+    method: PATCH
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/time_entries/99999999999/stop
   response:
     body:
-      string: '[{"id":4415272765,"workspace_id":21407567,"project_id":219958850,"task_id":null,"billable":false,"start":"2026-05-19T15:00:00+00:00","stop":"2026-05-19T15:40:00+00:00","duration":2400,"description":"Weekly
-        review","tags":["docs","review"],"tag_ids":[20464810,20464809],"duronly":true,"at":"2026-05-20T19:34:40.634291Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958850},{"id":4415272751,"workspace_id":21407567,"project_id":219958848,"task_id":null,"billable":false,"start":"2026-05-19T11:00:00+00:00","stop":"2026-05-19T11:50:00+00:00","duration":3000,"description":"Testing","tags":["dev"],"tag_ids":[20464801],"duronly":true,"at":"2026-05-20T19:34:39.96412Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958848},{"id":4415272731,"workspace_id":21407567,"project_id":219958851,"task_id":null,"billable":false,"start":"2026-05-19T09:00:00+00:00","stop":"2026-05-19T11:00:00+00:00","duration":7200,"description":"Feature
-        work","tags":["dev"],"tag_ids":[20464801],"duronly":true,"at":"2026-05-20T19:34:39.283868Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958851},{"id":4415272717,"workspace_id":21407567,"project_id":219958851,"task_id":null,"billable":false,"start":"2026-05-18T15:00:00+00:00","stop":"2026-05-18T15:30:00+00:00","duration":1800,"description":"Team
-        sync","tags":["meeting"],"tag_ids":[20464800],"duronly":true,"at":"2026-05-20T19:34:38.595706Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958851},{"id":4415272705,"workspace_id":21407567,"project_id":219958848,"task_id":null,"billable":false,"start":"2026-05-18T11:00:00+00:00","stop":"2026-05-18T12:15:00+00:00","duration":4500,"description":"Bug
-        investigation","tags":["dev","review"],"tag_ids":[20464801,20464809],"duronly":true,"at":"2026-05-20T19:34:37.936524Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958848},{"id":4415272688,"workspace_id":21407567,"project_id":219958850,"task_id":null,"billable":false,"start":"2026-05-18T09:00:00+00:00","stop":"2026-05-18T10:00:00+00:00","duration":3600,"description":"Documentation","tags":["docs"],"tag_ids":[20464810],"duronly":true,"at":"2026-05-20T19:34:37.262701Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958850},{"id":4415272671,"workspace_id":21407567,"project_id":219958850,"task_id":null,"billable":false,"start":"2026-05-17T14:00:00+00:00","stop":"2026-05-17T14:30:00+00:00","duration":1800,"description":"Code
-        review","tags":["review"],"tag_ids":[20464809],"duronly":true,"at":"2026-05-20T19:34:36.583692Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958850},{"id":4415272662,"workspace_id":21407567,"project_id":219958848,"task_id":null,"billable":false,"start":"2026-05-17T10:00:00+00:00","stop":"2026-05-17T11:30:00+00:00","duration":5400,"description":"Implementation
-        work","tags":["dev"],"tag_ids":[20464801],"duronly":true,"at":"2026-05-20T19:34:35.920713Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958848},{"id":4415272652,"workspace_id":21407567,"project_id":219958848,"task_id":null,"billable":false,"start":"2026-05-17T09:00:00+00:00","stop":"2026-05-17T09:45:00+00:00","duration":2700,"description":"Planning
-        session","tags":["meeting"],"tag_ids":[20464800],"duronly":true,"at":"2026-05-20T19:34:35.260028Z","server_deleted_at":null,"user_id":13186279,"uid":13186279,"wid":21407567,"pid":219958848}]'
+      string: '"Time entry not found"'
     headers:
       Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      - h3=":443"; ma=2592000
       Cache-Control:
       - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
       Content-Length:
-      - '3559'
+      - '22'
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sat, 23 May 2026 16:51:39 GMT
+      - Wed, 10 Jun 2026 07:24:26 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-lkcdp
-      Referrer-Policy:
-      - strict-origin-when-cross-origin
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Server:
       - nginx
       Strict-Transport-Security:
@@ -52,16 +45,14 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-ID:
-      - 186f1341a918c22ce46bfe3d1e51f213
-      X-Service-Level:
-      - GREEN
+      - 1f8a35be91d2e8d46fec9039fd088cc0
       X-Toggl-Quota-Remaining:
-      - '597'
+      - '599'
       X-Toggl-Quota-Resets-In:
-      - '3501'
+      - '3600'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:
-      code: 200
-      message: OK
+      code: 404
+      message: Not Found
 version: 1

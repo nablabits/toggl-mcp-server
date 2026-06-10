@@ -64,33 +64,3 @@ async def _get_default_workspace_id() -> Union[int, str]:
     if isinstance(result, str):
         return f"Failed to fetch default workspace ID: {result}"
     return result.get("default_workspace_id")
-
-
-async def _get_project_id_by_name(project_name: str, workspace_id: int) -> Union[int, str]:
-    projects_response = await _get_projects(workspace_id)
-    if "error" in projects_response:
-        return f"Error fetching projects: {projects_response['error']}"
-    for project in projects_response.get("projects", []):
-        if project.get("name") == project_name:
-            return project.get("id")
-    return f"Project with name '{project_name}' doesn't exist"
-
-
-async def _get_time_entry_id_by_name(time_entry_name: str, workspace_id: int) -> Union[int, str]:
-    time_entries_response = await _get_time_entries()
-    if "error" in time_entries_response:
-        return f"Error fetching time_entries: {time_entries_response['error']}"
-    for time_entry in time_entries_response:
-        if time_entry.get("description") == time_entry_name:
-            return time_entry.get("id")
-    return f"Time entry with name '{time_entry_name}' doesn't exist"
-
-
-async def _get_workspace_id_by_name(workspace_name: str) -> Union[int, str]:
-    workspaces_response = await _get_workspaces()
-    if isinstance(workspaces_response, dict) and "error" in workspaces_response:
-        return f"Error fetching workspaces: {workspaces_response['error']}"
-    for workspace in workspaces_response:
-        if workspace.get("name") == workspace_name:
-            return workspace.get("id")
-    return f"Workspace with name '{workspace_name}' doesn't exist"

@@ -11,15 +11,8 @@ from helpers.time import (
     _get_date_range,
     _iso_timestamp,
 )
-from resources import (
-    _get_default_workspace_id,
-    _get_project_id_by_name,
-)
+from resources import _get_default_workspace_id
 from resources import _get_time_entries_for_range as _fetch_time_entries_for_range
-from resources import (
-    _get_time_entry_id_by_name,
-    _get_workspace_id_by_name,
-)
 
 
 async def _new_time_entry_helper(
@@ -105,49 +98,40 @@ async def _update_time_entry_helper(
 async def create_time_entry(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
-    project_name: Optional[str] = None,
+    project_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = -1,
     billable: Optional[bool] = False,
-    workspace_name: Optional[str] = None,
+    workspace_id: Optional[int] = None,
 ) -> dict:
     """
     Create a Toggl Track time entry with flexible options for live or past tracking.
 
-    If `workspace_name` is not provided, set it as None.
+    Use `get_all_projects` first to discover project IDs.
 
     Duration is in seconds. Set to -1 for live tracking.
 
     Args:
         description (str, optional): What the time entry is about.
         tags (List[str], optional): List of tags (names only).
-        project_name (str, optional): Name of the associated project.
+        project_id (int, optional): ID of the associated project.
         start (str, optional): ISO 8601 UTC start time.
         stop (str, optional): ISO 8601 UTC stop time.
         duration (int, optional): Duration in seconds. Set to -1 for live tracking.
         billable (bool, optional): Whether this is billable time.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         dict: Toggl API response on success, or error dict on failure.
     """
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return {"error": workspace_id}
     if workspace_id is None:
         return {"error": "Could not determine workspace ID."}
-
-    project_id = None
-    if project_name is not None:
-        project_id_or_error = await _get_project_id_by_name(project_name, workspace_id)
-        if isinstance(project_id_or_error, str):
-            return {"error": project_id_or_error}
-        project_id = project_id_or_error
 
     final_start_for_api = start
     final_stop_for_api = stop
@@ -247,94 +231,60 @@ async def create_time_entry(
 
 @mcp.tool()
 async def stop_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
-    workspace_name: Optional[str] = None,
+    entry_id: int,
+    workspace_id: Optional[int] = None,
 ) -> Union[dict, str]:
     """
     Stop a currently running time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
-
-    If `workspace_name` is not provided, set it as None.
+    Use `get_current_time_entry` to find the entry_id of the running entry.
 
     Args:
-        time_entry_name (str, optional): Description of the running time entry to stop.
-        entry_id (int, optional): Exact ID of the time entry to stop.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        entry_id (int): Exact ID of the time entry to stop.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         dict: JSON response from the Toggl API if successful.
         str: Error message on failure.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
-    return await _stopping_time_entry_helper(time_entry_id, workspace_id)
+    return await _stopping_time_entry_helper(entry_id, workspace_id)
 
 
 @mcp.tool()
 async def delete_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
-    workspace_name: Optional[str] = None,
+    entry_id: int,
+    workspace_id: Optional[int] = None,
 ) -> str:
     """
     Deletes a time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
-
-    If `workspace_name` is not provided, set it as None.
+    Use `get_time_entries_for_range` to find the entry_id first.
 
     Args:
-        time_entry_name (str, optional): Description of the time entry to delete.
-        entry_id (int, optional): Exact ID of the time entry to delete.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        entry_id (int): Exact ID of the time entry to delete.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
 
     Returns:
         str: Success or error message.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
-    delete_status = await _deleting_time_entry_helper(time_entry_id, workspace_id)
+    delete_status = await _deleting_time_entry_helper(entry_id, workspace_id)
     if isinstance(delete_status, int):
-        return f"Successfully deleted the time entry with time_entry_id: {time_entry_id}"
+        return f"Successfully deleted the time entry with time_entry_id: {entry_id}"
     elif delete_status == "Time Entry not found/accessible":
-        return f"Time entry with time_entry_id {time_entry_id} was not found or is inaccessible."
-    return f"Failed to delete time_entry {time_entry_id}. Details: {delete_status}"
+        return f"Time entry with time_entry_id {entry_id} was not found or is inaccessible."
+    return f"Failed to delete time_entry {entry_id}. Details: {delete_status}"
 
 
 @mcp.tool()
@@ -351,9 +301,8 @@ async def get_current_time_entry() -> Union[dict, str]:
 
 @mcp.tool()
 async def update_time_entry(
-    time_entry_name: Optional[str] = None,
-    entry_id: Optional[int] = None,
-    workspace_name: Optional[str] = None,
+    entry_id: int,
+    workspace_id: Optional[int] = None,
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
@@ -365,15 +314,12 @@ async def update_time_entry(
     """
     Update one or more attributes of an existing time entry.
 
-    Provide either `entry_id` (unambiguous) or `time_entry_name` (matched by description).
-    When multiple entries share the same description, prefer `entry_id`.
-
-    If `workspace_name` is not provided, set it as None.
+    Use `get_time_entries_for_range` to find the entry_id first.
 
     Args:
-        time_entry_name (str, optional): Description of the time entry to update.
-        entry_id (int, optional): Exact ID of the time entry to update.
-        workspace_name (str, optional): Name of the workspace. Defaults to user's default workspace.
+        entry_id (int): Exact ID of the time entry to update.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
         description (str, optional): New description.
         tags (List[str], optional): New list of tags.
         project_id (int, optional): New project ID.
@@ -386,26 +332,13 @@ async def update_time_entry(
         dict: JSON response from Toggl if update is successful.
         str: Error message on failure.
     """
-    if entry_id is None and time_entry_name is None:
-        return "Either time_entry_name or entry_id must be provided."
-
-    workspace_id = (
-        await _get_default_workspace_id()
-        if workspace_name is None
-        else await _get_workspace_id_by_name(workspace_name)
-    )
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
     if isinstance(workspace_id, str):
         return workspace_id
 
-    if entry_id is not None:
-        time_entry_id = entry_id
-    else:
-        time_entry_id = await _get_time_entry_id_by_name(time_entry_name, workspace_id)
-        if isinstance(time_entry_id, str):
-            return time_entry_id
-
     return await _update_time_entry_helper(
-        time_entry_id=time_entry_id,
+        time_entry_id=entry_id,
         workspace_id=workspace_id,
         description=description,
         tags=tags,

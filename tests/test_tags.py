@@ -44,87 +44,52 @@ async def test_get_tags_forbidden(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# Workspace not found
+# Workspace error propagation — get / create / update / delete
 # ---------------------------------------------------------------------------
+
+_WS_ERROR = "Failed to fetch default workspace ID: 503 error"
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_get_tags_workspace_not_found():
-    result = await get_tags(workspace_name="NonExistentWS")
-    assert isinstance(result, str)
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
-# Tag not found
-# ---------------------------------------------------------------------------
+async def test_get_tags_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await get_tags()
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_tag_not_found():
-    result = await update_tag(tag_name="NonExistent Tag", new_name="x")
-    assert isinstance(result, str)
-    assert result == "Tag with name 'NonExistent Tag' doesn't exist"
+async def test_create_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await create_tag(name="my-tag")
+    assert result == _WS_ERROR
 
 
 @pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_tag_not_found():
-    result = await delete_tag(tag_name="NonExistent Tag")
-    assert isinstance(result, str)
-    assert result == "Tag with name 'NonExistent Tag' doesn't exist"
+async def test_update_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await update_tag(tag_id=42, new_name="dev2")
+    assert result == _WS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_delete_tag_workspace_error():
+    with patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=_WS_ERROR):
+        result = await delete_tag(tag_id=42)
+    assert result == _WS_ERROR
 
 
 # ---------------------------------------------------------------------------
-# Workspace not found — create / update / delete
+# API error paths — update / delete
 # ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_create_tag_workspace_not_found():
-    result = await create_tag(name="my-tag", workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_update_tag_workspace_not_found():
-    result = await update_tag(tag_name="dev", new_name="dev2", workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-@pytest.mark.asyncio
-@pytest.mark.vcr
-async def test_delete_tag_workspace_not_found():
-    result = await delete_tag(tag_name="dev", workspace_name="NonExistentWS")
-    assert result == "Workspace with name 'NonExistentWS' doesn't exist"
-
-
-# ---------------------------------------------------------------------------
-# API error paths — get_tag_id / update / delete
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_tag_id_by_name_helper_error():
-    with patch("tags.toggl_request", new_callable=AsyncMock, return_value="503 error"):
-        from tags import _get_tag_id_by_name
-
-        result = await _get_tag_id_by_name("dev", 12345)
-    assert result == "Error fetching tags: 503 error"
 
 
 @pytest.mark.asyncio
 async def test_update_tag_api_error():
     with (
         patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("tags._get_tag_id_by_name", new_callable=AsyncMock, return_value=42),
         patch("tags._update_tag_helper", new_callable=AsyncMock, return_value="503 error"),
     ):
-        result = await update_tag(tag_name="dev", new_name="dev2")
+        result = await update_tag(tag_id=42, new_name="dev2")
     assert result == "Failed to update tag: 503 error"
 
 
@@ -132,8 +97,7 @@ async def test_update_tag_api_error():
 async def test_delete_tag_api_error():
     with (
         patch("tags._get_default_workspace_id", new_callable=AsyncMock, return_value=12345),
-        patch("tags._get_tag_id_by_name", new_callable=AsyncMock, return_value=42),
         patch("tags._delete_tag_helper", new_callable=AsyncMock, return_value="503 error"),
     ):
-        result = await delete_tag(tag_name="dev")
-    assert result == "Failed to delete tag 'dev': 503 error"
+        result = await delete_tag(tag_id=42)
+    assert result == "Failed to delete tag (id: 42): 503 error"

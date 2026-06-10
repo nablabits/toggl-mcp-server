@@ -8,12 +8,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import resources
-from resources import (
-    _get_default_workspace_id,
-    _get_project_id_by_name,
-    _get_time_entry_id_by_name,
-    _get_workspace_id_by_name,
-)
+from resources import _get_default_workspace_id
 from toggl_mcp_server import _get_projects, _get_time_entries, _get_workspaces, get_tasks
 
 WORKSPACE_ID = int(os.environ["TOGGL_WORKSPACE_ID"])
@@ -92,7 +87,9 @@ async def test_get_workspaces(vcr):
 @pytest.mark.asyncio
 @pytest.mark.vcr
 async def test_get_tasks(vcr):
-    result = await get_tasks(project_name="Alpha")
+    projects = await _get_projects(WORKSPACE_ID)
+    alpha_id = next(p["id"] for p in projects["projects"] if p["name"] == "Alpha")
+    result = await get_tasks(project_id=alpha_id)
 
     assert isinstance(result, list), f"Expected list, got: {result}"
     names = {t["name"] for t in result}
@@ -123,62 +120,6 @@ async def test_get_default_workspace_id_api_error(monkeypatch):
     with patch("resources.toggl_request", new_callable=AsyncMock, return_value="503 error"):
         result = await _get_default_workspace_id()
     assert result == "Failed to fetch default workspace ID: 503 error"
-
-
-# ---------------------------------------------------------------------------
-# _get_project_id_by_name — _get_projects returns an error
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_project_id_by_name_projects_error():
-    with patch(
-        "resources._get_projects",
-        new_callable=AsyncMock,
-        return_value={"error": "upstream failure"},
-    ):
-        result = await _get_project_id_by_name("Alpha", 12345)
-    assert result == "Error fetching projects: upstream failure"
-
-
-# ---------------------------------------------------------------------------
-# _get_time_entry_id_by_name — _get_time_entries returns an error
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_time_entry_id_by_name_entries_error():
-    with patch(
-        "resources._get_time_entries",
-        new_callable=AsyncMock,
-        return_value={"error": "upstream failure"},
-    ):
-        result = await _get_time_entry_id_by_name("My entry", 12345)
-    assert result == "Error fetching time_entries: upstream failure"
-
-
-# ---------------------------------------------------------------------------
-# _get_workspace_id_by_name — error and success paths
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_get_workspace_id_by_name_workspaces_error():
-    with patch(
-        "resources._get_workspaces",
-        new_callable=AsyncMock,
-        return_value={"error": "upstream failure"},
-    ):
-        result = await _get_workspace_id_by_name("MyWorkspace")
-    assert result == "Error fetching workspaces: upstream failure"
-
-
-@pytest.mark.asyncio
-async def test_get_workspace_id_by_name_found():
-    fake_workspaces = [{"id": 42, "name": "MyWorkspace"}, {"id": 99, "name": "Other"}]
-    with patch("resources._get_workspaces", new_callable=AsyncMock, return_value=fake_workspaces):
-        result = await _get_workspace_id_by_name("MyWorkspace")
-    assert result == 42
 
 
 # ---------------------------------------------------------------------------
