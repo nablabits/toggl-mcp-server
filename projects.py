@@ -1,10 +1,10 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Literal, Optional, Union
 
 from app import TOGGL_COLORS, Endpoints, mcp
 from helpers.http import toggl_request
 from resources import (
+    _fetch_projects,
     _get_default_workspace_id,
-    _get_projects,
 )
 
 
@@ -186,13 +186,45 @@ async def update_project(
 
 
 @mcp.tool()
-async def get_all_projects(workspace_id: Optional[int] = None) -> Union[dict, str]:
+async def get_project_by_id(
+    project_id: int, workspace_id: Optional[int] = None
+) -> Union[dict, str]:
+    """
+    Retrieve a single Toggl project by its ID.
+
+    Args:
+        project_id (int): The ID of the project to retrieve.
+        workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
+            var or your Toggl default workspace.
+
+    Returns:
+        dict: Project data on success.
+        str: Error message on failure.
+    """
+    if workspace_id is None:
+        workspace_id = await _get_default_workspace_id()
+    if isinstance(workspace_id, str):
+        return workspace_id
+
+    response = await toggl_request("get", Endpoints(workspace_id).project(project_id))
+    if isinstance(response, str):
+        return f"Failed to fetch project {project_id}: {response}"
+    return response
+
+
+@mcp.tool()
+async def get_all_projects(
+    workspace_id: Optional[int] = None,
+    active: Union[bool, Literal["both"]] = True,
+) -> Union[dict, str]:
     """
     Retrieve all projects in the user's Toggl workspace.
 
     Args:
         workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
             var or your Toggl default workspace.
+        active (bool | "both", optional): Filter by status. True (default) returns only active
+            projects, False returns only inactive ones, "both" returns all.
 
     Returns:
         dict: JSON response containing all projects.
@@ -203,7 +235,7 @@ async def get_all_projects(workspace_id: Optional[int] = None) -> Union[dict, st
     if isinstance(workspace_id, str):
         return workspace_id
 
-    projects_response = await _get_projects(workspace_id)
+    projects_response = await _fetch_projects(workspace_id, active=active)
     if isinstance(projects_response, dict) and "error" in projects_response:
         return f"Error fetching projects for workspace ID {workspace_id}: {projects_response['error']}"
     if not isinstance(projects_response, dict) or "projects" not in projects_response:

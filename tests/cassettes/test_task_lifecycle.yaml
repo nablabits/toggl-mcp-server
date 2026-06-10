@@ -15,10 +15,10 @@ interactions:
       User-Agent:
       - python-httpx/0.28.1
     method: GET
-    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects?page=1&per_page=200&active=true
   response:
     body:
-      string: '[{"id":219958848,"workspace_id":21407567,"client_id":null,"name":"Alpha","is_private":true,"active":true,"at":"2026-05-20T19:35:19+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#4dc3ff","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":4,"actual_seconds":15600,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958850,"workspace_id":21407567,"client_id":null,"name":"Beta","is_private":true,"active":true,"at":"2026-05-20T19:34:33+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#8ab734","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":7908,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958851,"workspace_id":21407567,"client_id":null,"name":"Gamma","is_private":true,"active":true,"at":"2026-05-20T19:34:34+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#f68d38","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":9000,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false}]'
+      string: '[{"id":219958848,"workspace_id":21407567,"client_id":null,"name":"Alpha","is_private":true,"active":true,"at":"2026-06-10T09:02:05+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#4dc3ff","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":4,"actual_seconds":15600,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958850,"workspace_id":21407567,"client_id":null,"name":"Beta","is_private":true,"active":true,"at":"2026-05-20T19:34:33+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#8ab734","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":7908,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false},{"id":219958851,"workspace_id":21407567,"client_id":null,"name":"Gamma","is_private":true,"active":true,"at":"2026-05-20T19:34:34+00:00","created_at":"2026-05-20T19:34:31+00:00","server_deleted_at":null,"color":"#f68d38","billable":true,"template":false,"auto_estimates":false,"estimated_hours":null,"estimated_seconds":null,"rate":null,"rate_last_updated":null,"currency":null,"recurring":false,"template_id":null,"recurring_parameters":null,"fixed_fee":null,"actual_hours":2,"actual_seconds":9000,"total_count":3,"client_name":null,"can_track_time":true,"start_date":"2026-05-20","status":"active","wid":21407567,"cid":null,"pinned":false}]'
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000
@@ -29,9 +29,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 01 Jun 2026 18:10:05 GMT
+      - Wed, 10 Jun 2026 09:17:48 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-lkcdp
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -47,9 +47,9 @@ interactions:
       X-Page:
       - '1'
       X-Page-Size:
-      - '151'
+      - '200'
       X-Request-ID:
-      - 3b02d73c8ab55677b828cae76fd6e295
+      - 8d27f9e43380467dc8a8d309c3be320c
       X-Service-Level:
       - GREEN
       X-Sort-Field:
@@ -57,9 +57,9 @@ interactions:
       X-Sort-Order:
       - asc
       X-Toggl-Quota-Remaining:
-      - '594'
+      - '589'
       X-Toggl-Quota-Resets-In:
-      - '3453'
+      - '2356'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:
@@ -86,7 +86,7 @@ interactions:
     uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks
   response:
     body:
-      string: '{"id":242295253,"name":"Lifecycle task","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-01T18:10:05+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0,"project_is_private":true}'
+      string: '{"id":242387367,"name":"Lifecycle task","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-10T09:17:48+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0,"project_is_private":true}'
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000
@@ -97,9 +97,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 01 Jun 2026 18:10:05 GMT
+      - Wed, 10 Jun 2026 09:17:48 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-ppt5f
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -113,13 +113,13 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-ID:
-      - 406c6264a5d6ff619cbb3120e2eafbb1
+      - 9ae75e8ed4c20a8ee779e127108eb84c
       X-Service-Level:
       - GREEN
       X-Toggl-Quota-Remaining:
-      - '593'
+      - '588'
       X-Toggl-Quota-Resets-In:
-      - '3452'
+      - '2355'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:
@@ -144,8 +144,8 @@ interactions:
     uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks
   response:
     body:
-      string: '[{"id":242178346,"name":"Research","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0},{"id":242178347,"name":"Implementation","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0},{"id":242295253,"name":"Lifecycle
-        task","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-01T18:10:05+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0}]'
+      string: '[{"id":242178346,"name":"Research","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0},{"id":242178347,"name":"Implementation","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-05-20T19:34:32+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0},{"id":242387367,"name":"Lifecycle
+        task","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-10T09:17:48+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0}]'
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -156,9 +156,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 01 Jun 2026 18:10:05 GMT
+      - Wed, 10 Jun 2026 09:17:48 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-ppt5f
+      - track-public-api-proxy-57c75f56b6-k2cmx
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -172,13 +172,13 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-ID:
-      - 8ecaa8c2ea6023c7a2d0c82143cfbdb5
+      - 03bd92fb24ae8ed5030149a1b5f8330b
       X-Service-Level:
       - GREEN
       X-Toggl-Quota-Remaining:
-      - '592'
+      - '587'
       X-Toggl-Quota-Resets-In:
-      - '3452'
+      - '2355'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:
@@ -202,13 +202,13 @@ interactions:
       User-Agent:
       - python-httpx/0.28.1
     method: PUT
-    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks/242295253
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks/242387367
   response:
     body:
-      string: '{"id":242295253,"name":"Lifecycle task (updated)","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-01T18:10:06+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0,"project_is_private":true}'
+      string: '{"id":242387367,"name":"Lifecycle task (updated)","workspace_id":21407567,"project_id":219958848,"user_id":null,"recurring":false,"active":true,"at":"2026-06-10T09:17:48+00:00","server_deleted_at":null,"estimated_seconds":null,"tracked_seconds":0,"project_is_private":true}'
     headers:
       Alt-Svc:
-      - h3=":443"; ma=2592000
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Cache-Control:
       - no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0
       Content-Length:
@@ -216,9 +216,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 01 Jun 2026 18:10:06 GMT
+      - Wed, 10 Jun 2026 09:17:48 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-lkcdp
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -232,13 +232,13 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-ID:
-      - 62cebd2596fe8f58fc3e14902ffcf819
+      - f47b46cd67a707f40508fae8ef112c26
       X-Service-Level:
       - GREEN
       X-Toggl-Quota-Remaining:
-      - '591'
+      - '586'
       X-Toggl-Quota-Resets-In:
-      - '3452'
+      - '2355'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:
@@ -260,10 +260,10 @@ interactions:
       User-Agent:
       - python-httpx/0.28.1
     method: DELETE
-    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks/242295253
+    uri: https://api.track.toggl.com/api/v9/workspaces/21407567/projects/219958848/tasks/242387367
   response:
     body:
-      string: '242295253'
+      string: '242387367'
     headers:
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
@@ -274,9 +274,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 01 Jun 2026 18:10:06 GMT
+      - Wed, 10 Jun 2026 09:17:49 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-ppt5f
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -290,13 +290,13 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Request-ID:
-      - 125ba40fc4973963a1246d1d21eb9be9
+      - 4b162ff3ea6ac5f004895ef511bcad0e
       X-Service-Level:
       - GREEN
       X-Toggl-Quota-Remaining:
-      - '590'
+      - '585'
       X-Toggl-Quota-Resets-In:
-      - '3452'
+      - '2355'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:

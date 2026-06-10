@@ -29,9 +29,9 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 10 Jun 2026 09:17:49 GMT
+      - Wed, 10 Jun 2026 09:25:30 GMT
       Instance:
-      - track-public-api-proxy-57c75f56b6-k2cmx
+      - track-public-api-proxy-57c75f56b6-g7nsv
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
@@ -49,7 +49,7 @@ interactions:
       X-Page-Size:
       - '200'
       X-Request-ID:
-      - 7b48b2917a27ba6c2e06a79ac13164e8
+      - 319a368290eb2009016325348dacff34
       X-Service-Level:
       - GREEN
       X-Sort-Field:
@@ -57,9 +57,9 @@ interactions:
       X-Sort-Order:
       - asc
       X-Toggl-Quota-Remaining:
-      - '583'
+      - '579'
       X-Toggl-Quota-Resets-In:
-      - '2354'
+      - '1893'
       X-We-are-hiring:
       - https://toggl.com/jobs/
     status:

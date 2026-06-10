@@ -8,12 +8,13 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import resources
-from resources import _get_default_workspace_id
+from resources import _fetch_projects, _get_default_workspace_id
 from toggl_mcp_server import _get_projects, _get_time_entries, _get_workspaces, get_tasks
 
 WORKSPACE_ID = int(os.environ["TOGGL_WORKSPACE_ID"])
 
 SEEDED_PROJECTS = {"Alpha", "Beta", "Gamma"}
+SEEDED_ARCHIVED_PROJECTS = {"Archived sample project"}
 SEEDED_TAGS = {"dev", "review", "meeting", "docs"}
 SEEDED_TASKS = {"Research", "Implementation"}  # tasks seeded under Alpha
 SEEDED_ENTRIES = {
@@ -155,3 +156,73 @@ async def test_get_workspaces_does_not_cache_errors():
         assert resources._workspaces_cache is None
     finally:
         resources._workspaces_cache = None
+
+
+# ---------------------------------------------------------------------------
+# _fetch_projects — pagination
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_fetch_projects_empty_workspace():
+    with patch("resources.toggl_request", new_callable=AsyncMock, return_value=[]) as mock_req:
+        result = await _fetch_projects(WORKSPACE_ID)
+
+    assert result == {"projects": []}
+    mock_req.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_fetch_projects_multiple_pages():
+    page1 = [{"id": i, "name": f"P{i}", "active": True} for i in range(200)]
+    page2 = [{"id": 200, "name": "P200", "active": True}]
+
+    with patch(
+        "resources.toggl_request", new_callable=AsyncMock, side_effect=[page1, page2]
+    ) as mock_req:
+        result = await _fetch_projects(WORKSPACE_ID)
+
+    assert result == {"projects": page1 + page2}
+    assert mock_req.call_count == 2
+
+
+# ---------------------------------------------------------------------------
+# _fetch_projects — active filter
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.vcr
+async def test_fetch_projects_active_only():
+    result = await _fetch_projects(WORKSPACE_ID, active=True)
+
+    assert "projects" in result
+    names = {p["name"] for p in result["projects"]}
+    assert SEEDED_PROJECTS.issubset(names)
+    assert not SEEDED_ARCHIVED_PROJECTS.intersection(names)
+    assert all(p["active"] is True for p in result["projects"])
+
+
+@pytest.mark.asyncio
+@pytest.mark.vcr
+async def test_fetch_projects_inactive_only():
+    result = await _fetch_projects(WORKSPACE_ID, active=False)
+
+    assert "projects" in result
+    names = {p["name"] for p in result["projects"]}
+    assert SEEDED_ARCHIVED_PROJECTS.issubset(names)
+    assert not SEEDED_PROJECTS.intersection(names)
+    assert all(p["active"] is False for p in result["projects"])
+
+
+@pytest.mark.asyncio
+@pytest.mark.vcr
+async def test_fetch_projects_both():
+    result = await _fetch_projects(WORKSPACE_ID, active="both")
+
+    assert "projects" in result
+    names = {p["name"] for p in result["projects"]}
+    assert SEEDED_PROJECTS.issubset(names)
+    assert SEEDED_ARCHIVED_PROJECTS.issubset(names)
+    statuses = {p["active"] for p in result["projects"]}
+    assert statuses == {True, False}
