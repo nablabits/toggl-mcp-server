@@ -140,8 +140,11 @@ async def create_time_entry(
     if workspace_id is None:
         return {"error": "Could not determine workspace ID."}
 
-    final_start_for_api = _normalize_timestamp(start) if start else start
-    final_stop_for_api = _normalize_timestamp(stop) if stop else stop
+    try:
+        final_start_for_api = _normalize_timestamp(start) if start else start
+        final_stop_for_api = _normalize_timestamp(stop) if stop else stop
+    except ValueError as e:
+        return {"error": str(e)}
 
     toggl_time_entry = await _new_time_entry_helper(
         description=description,
@@ -280,6 +283,12 @@ async def update_time_entry(
     if isinstance(workspace_id, str):
         return workspace_id
 
+    try:
+        final_start = _normalize_timestamp(start) if start else start
+        final_stop = _normalize_timestamp(stop) if stop else stop
+    except ValueError as e:
+        return f"Error: {e}"
+
     return await _update_time_entry_helper(
         time_entry_id=entry_id,
         workspace_id=workspace_id,
@@ -287,8 +296,8 @@ async def update_time_entry(
         tags=tags,
         project_id=project_id,
         task_id=task_id,
-        start=_normalize_timestamp(start) if start else start,
-        stop=_normalize_timestamp(stop) if stop else stop,
+        start=final_start,
+        stop=final_stop,
         duration=duration,
         billable=billable,
     )

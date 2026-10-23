@@ -9,6 +9,8 @@
 ### Behaviour change
 
 - `start`/`stop` are now interpreted identically by `create_time_entry` and `update_time_entry`. A trailing `Z` (or an explicit offset such as `+02:00`) is honoured, so `06:21:50Z` is 06:21:50 UTC. Previously `create_time_entry` stripped the `Z` and treated the value as local time (shifting it by the local offset) while `update_time_entry` stored it as given. A value with **no suffix** is still interpreted as system-local time. If you were appending `Z` to local times, drop the `Z`.
+- `update_time_entry` now also converts a **suffix-less** `start`/`stop` from system-local time to UTC. Previously it forwarded such values unchanged, so Toggl treated them as UTC. Append `Z` if you meant UTC.
+- Unparseable timestamps, and suffix-less local times that fall in a DST gap or fold, are now rejected with a clear error instead of being forwarded to Toggl as-is. Pass `Z` or an explicit offset to resolve a DST case.
 - `create_time_entry` no longer returns a `debug_info` block in its response.
 
 ---

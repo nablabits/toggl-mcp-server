@@ -84,10 +84,11 @@ async def test_start_fractional_seconds_naive(mock_workspace, mock_helper):
 
 
 @pytest.mark.asyncio
-async def test_start_unparseable_passed_through(mock_workspace, mock_helper):
-    await create_time_entry(start="not-a-date", duration=3600)
+async def test_start_unparseable_returns_error(mock_workspace, mock_helper):
+    result = await create_time_entry(start="not-a-date", duration=3600)
 
-    assert mock_helper.call_args.kwargs["start"] == "not-a-date"
+    assert "Invalid timestamp" in result["error"]
+    mock_helper.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -145,6 +146,24 @@ async def test_update_time_entry_passes_task_id_and_normalizes_z(mock_workspace)
     payload = req.call_args.kwargs["json"]
     assert payload["task_id"] == 777
     assert payload["start"] == "2025-05-01T06:21:50.000Z"
+
+
+@pytest.mark.asyncio
+async def test_create_time_entry_invalid_timestamp_returns_error_without_api_call(mock_workspace):
+    with patch("time_entries.toggl_request", new_callable=AsyncMock) as req:
+        result = await create_time_entry(start="tomorrow 9am")
+
+    assert "Invalid timestamp" in result["error"]
+    req.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_update_time_entry_invalid_timestamp_returns_error_without_api_call(mock_workspace):
+    with patch("time_entries.toggl_request", new_callable=AsyncMock) as req:
+        result = await update_time_entry(entry_id=5, stop="nope")
+
+    assert isinstance(result, str) and "Invalid timestamp" in result
+    req.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
@@ -355,10 +374,11 @@ async def test_create_time_entry_with_project_id(mock_workspace, mock_helper):
 
 
 @pytest.mark.asyncio
-async def test_start_localzone_failure_falls_back_to_original(mock_workspace, mock_helper):
+async def test_start_localzone_failure_propagates_without_api_call(mock_workspace, mock_helper):
     with patch("helpers.time.get_localzone", side_effect=Exception("tz unavailable")):
-        await create_time_entry(start="2025-05-01T10:00:00", duration=3600)
-    assert mock_helper.call_args.kwargs["start"] == "2025-05-01T10:00:00"
+        with pytest.raises(Exception, match="tz unavailable"):
+            await create_time_entry(start="2025-05-01T10:00:00", duration=3600)
+    mock_helper.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -369,10 +389,11 @@ async def test_stop_only_naive_converted_to_utc(mock_workspace, mock_helper):
 
 
 @pytest.mark.asyncio
-async def test_stop_localzone_failure_falls_back_to_original(mock_workspace, mock_helper):
+async def test_stop_localzone_failure_propagates_without_api_call(mock_workspace, mock_helper):
     with patch("helpers.time.get_localzone", side_effect=Exception("tz unavailable")):
-        await create_time_entry(stop="2025-05-01T11:00:00")
-    assert mock_helper.call_args.kwargs["stop"] == "2025-05-01T11:00:00"
+        with pytest.raises(Exception, match="tz unavailable"):
+            await create_time_entry(stop="2025-05-01T11:00:00")
+    mock_helper.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

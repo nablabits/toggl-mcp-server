@@ -41,14 +41,33 @@ def _normalize_timestamp(value: str) -> str:
     """Return `value` as a UTC ISO timestamp ending in 'Z'.
 
     A trailing 'Z' or an explicit offset (e.g. '+02:00') is honoured as given.
-    A naive value (no suffix) is interpreted as system-local time. If the value
-    cannot be parsed it is returned unchanged so the API can report the error.
+    A naive value (no suffix) is interpreted as system-local time.
+
+    Raises ValueError if the value cannot be parsed, or if a naive value falls in a
+    DST gap (does not exist locally) or fold (occurs twice) and so has no single UTC
+    equivalent. Callers surface the message; pass an explicit offset to resolve it.
     """
+    text = value.strip()
+    if text[-1:] == "z":
+        text = text[:-1] + "Z"
     try:
-        dt = datetime.datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=get_localzone())
-        return _iso_timestamp(dt.astimezone(timezone.utc))
-    except Exception as e:
-        print(f"WARNING: Timestamp normalization failed for '{value}': {e}. Using original value.")
-        return value
+        dt = datetime.datetime.fromisoformat(text)
+    except ValueError as e:
+        raise ValueError(
+            f"Invalid timestamp '{value}': expected ISO 8601, e.g. '2026-10-23T08:21:50' "
+            f"(local), '2026-10-23T06:21:50Z' (UTC) or '2026-10-23T08:21:50+02:00'."
+        ) from e
+
+    if dt.tzinfo is None:
+        local_tz = get_localzone()
+        first = dt.replace(tzinfo=local_tz, fold=0)
+        second = dt.replace(tzinfo=local_tz, fold=1)
+        if first.utcoffset() != second.utcoffset():
+            roundtrip = first.astimezone(timezone.utc).astimezone(local_tz).replace(tzinfo=None)
+            problem = "does not exist" if roundtrip != dt else "is ambiguous"
+            raise ValueError(
+                f"Local time '{value}' {problem} in {local_tz} because of a DST change. "
+                f"Pass an explicit offset (e.g. '+01:00') or 'Z' instead."
+            )
+        dt = first
+    return _iso_timestamp(dt.astimezone(timezone.utc))
