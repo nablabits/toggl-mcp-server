@@ -25,6 +25,7 @@ htmlcov/
 # code editors
 .vscode/
 .idea/
+tags
 
 # Claude Code project settings
 .claude/

@@ -1,7 +1,4 @@
-from datetime import timezone
 from typing import List, Optional, Tuple, Union
-
-from tzlocal import get_localzone
 
 from app import Endpoints, mcp
 from helpers.http import toggl_request
@@ -9,7 +6,7 @@ from helpers.time import (
     _convert_utc_to_local,
     _get_current_utc_time,
     _get_date_range,
-    _iso_timestamp,
+    _normalize_timestamp,
 )
 from resources import _get_default_workspace_id
 from resources import _get_time_entries_for_range as _fetch_time_entries_for_range
@@ -19,6 +16,7 @@ async def _new_time_entry_helper(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
+    task_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = -1,
@@ -38,6 +36,7 @@ async def _new_time_entry_helper(
         "description": description,
         "tags": tags,
         "project_id": project_id,
+        "task_id": task_id,
         "start": start if start else current_iso_time,
         "stop": stop,
         "duration": duration,
@@ -70,6 +69,7 @@ async def _update_time_entry_helper(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
+    task_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = None,
@@ -82,6 +82,7 @@ async def _update_time_entry_helper(
             "description": description,
             "tags": tags,
             "project_id": project_id,
+            "task_id": task_id,
             "start": start,
             "stop": stop,
             "duration": duration,
@@ -99,6 +100,7 @@ async def create_time_entry(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
+    task_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = -1,
@@ -112,12 +114,17 @@ async def create_time_entry(
 
     Duration is in seconds. Set to -1 for live tracking.
 
+    Timestamps: a trailing "Z" (or an explicit offset such as "+02:00") is honoured as that
+    zone, so "2026-10-23T06:21:50Z" is 06:21:50 UTC. Pass no suffix (e.g. "2026-10-23T08:21:50")
+    to give system-local time instead. Do NOT append "Z" to a local time.
+
     Args:
         description (str, optional): What the time entry is about.
         tags (List[str], optional): List of tags (names only).
         project_id (int, optional): ID of the associated project.
-        start (str, optional): ISO 8601 UTC start time.
-        stop (str, optional): ISO 8601 UTC stop time.
+        task_id (int, optional): ID of the project task to link the entry to (see `get_tasks`).
+        start (str, optional): ISO 8601 start time. "Z" = UTC; no suffix = system-local.
+        stop (str, optional): ISO 8601 stop time. "Z" = UTC; no suffix = system-local.
         duration (int, optional): Duration in seconds. Set to -1 for live tracking.
         billable (bool, optional): Whether this is billable time.
         workspace_id (int, optional): Workspace ID. If omitted, uses the TOGGL_WORKSPACE_ID env
@@ -133,76 +140,17 @@ async def create_time_entry(
     if workspace_id is None:
         return {"error": "Could not determine workspace ID."}
 
-    final_start_for_api = start
-    final_stop_for_api = stop
-    debug_info = {
-        "correction_applied_start": False,
-        "original_start_input": start,
-        "correction_applied_stop": False,
-        "original_stop_input": stop,
-        "system_timezone": None,
-    }
-    local_tz = None
-
-    if start:
-        try:
-            import datetime
-
-            naive_time_str = start.split(".")[0].replace("Z", "")
-            assumed_local_naive_dt = datetime.datetime.fromisoformat(naive_time_str)
-            if local_tz is None:
-                local_tz = get_localzone()
-                if not local_tz:
-                    raise ValueError("Failed to get local timezone")
-                debug_info["system_timezone"] = getattr(local_tz, "key", str(local_tz))
-            if hasattr(local_tz, "localize"):
-                assumed_local_dt = local_tz.localize(assumed_local_naive_dt, is_dst=None)
-            else:
-                assumed_local_dt = assumed_local_naive_dt.replace(tzinfo=local_tz)
-            corrected_utc_dt = assumed_local_dt.astimezone(timezone.utc)
-            final_start_for_api = _iso_timestamp(corrected_utc_dt)
-            debug_info["correction_applied_start"] = True
-            debug_info["corrected_utc_start"] = final_start_for_api
-        except Exception as e:
-            print(
-                f"WARNING: Timezone correction failed for start='{start}': {e}. Using original value."
-            )
-            final_start_for_api = start
-            debug_info["correction_error_start"] = str(e)
-            debug_info["correction_applied_start"] = False
-
-    if stop:
-        try:
-            import datetime
-
-            naive_time_str = stop.split(".")[0].replace("Z", "")
-            assumed_local_naive_dt = datetime.datetime.fromisoformat(naive_time_str)
-            if local_tz is None:
-                local_tz = get_localzone()
-                if not local_tz:
-                    raise ValueError("Failed to get local timezone")
-                if debug_info["system_timezone"] is None:
-                    debug_info["system_timezone"] = getattr(local_tz, "key", str(local_tz))
-            if hasattr(local_tz, "localize"):
-                assumed_local_dt = local_tz.localize(assumed_local_naive_dt, is_dst=None)
-            else:
-                assumed_local_dt = assumed_local_naive_dt.replace(tzinfo=local_tz)
-            corrected_utc_dt = assumed_local_dt.astimezone(timezone.utc)
-            final_stop_for_api = _iso_timestamp(corrected_utc_dt)
-            debug_info["correction_applied_stop"] = True
-            debug_info["corrected_utc_stop"] = final_stop_for_api
-        except Exception as e:
-            print(
-                f"WARNING: Timezone correction failed for stop='{stop}': {e}. Using original value."
-            )
-            final_stop_for_api = stop
-            debug_info["correction_error_stop"] = str(e)
-            debug_info["correction_applied_stop"] = False
+    try:
+        final_start_for_api = _normalize_timestamp(start) if start else start
+        final_stop_for_api = _normalize_timestamp(stop) if stop else stop
+    except ValueError as e:
+        return {"error": str(e)}
 
     toggl_time_entry = await _new_time_entry_helper(
         description=description,
         tags=tags,
         project_id=project_id,
+        task_id=task_id,
         start=final_start_for_api,
         stop=final_stop_for_api,
         duration=duration if start else -1,
@@ -211,21 +159,17 @@ async def create_time_entry(
     )
 
     if isinstance(toggl_time_entry, str) and toggl_time_entry.startswith("Error:"):
-        return {"error": toggl_time_entry, "debug_info": debug_info}
+        return {"error": toggl_time_entry}
     if not isinstance(toggl_time_entry, tuple) or len(toggl_time_entry) != 2:
         return {
-            "error": f"Unexpected response format from _new_time_entry_helper: {toggl_time_entry}",
-            "debug_info": debug_info,
+            "error": f"Unexpected response format from _new_time_entry_helper: {toggl_time_entry}"
         }
 
     toggl_time_entry_response, api_call_local_time = toggl_time_entry
-    debug_info["final_start_passed_to_helper"] = final_start_for_api
-    debug_info["final_stop_passed_to_helper"] = final_stop_for_api
 
     return {
         "toggle_time_entry_response": toggl_time_entry_response,
         "api_call_local_time": api_call_local_time,
-        "debug_info": debug_info,
     }
 
 
@@ -306,6 +250,7 @@ async def update_time_entry(
     description: Optional[str] = None,
     tags: Optional[List[str]] = None,
     project_id: Optional[int] = None,
+    task_id: Optional[int] = None,
     start: Optional[str] = None,
     stop: Optional[str] = None,
     duration: Optional[int] = None,
@@ -323,8 +268,9 @@ async def update_time_entry(
         description (str, optional): New description.
         tags (List[str], optional): New list of tags.
         project_id (int, optional): New project ID.
-        start (str, optional): New start timestamp (ISO 8601).
-        stop (str, optional): New stop timestamp.
+        task_id (int, optional): New task ID (see `get_tasks`).
+        start (str, optional): New start (ISO 8601). "Z" = UTC; no suffix = system-local.
+        stop (str, optional): New stop (ISO 8601). "Z" = UTC; no suffix = system-local.
         duration (int, optional): Duration in seconds.
         billable (bool, optional): Whether the entry is billable.
 
@@ -337,14 +283,21 @@ async def update_time_entry(
     if isinstance(workspace_id, str):
         return workspace_id
 
+    try:
+        final_start = _normalize_timestamp(start) if start else start
+        final_stop = _normalize_timestamp(stop) if stop else stop
+    except ValueError as e:
+        return f"Error: {e}"
+
     return await _update_time_entry_helper(
         time_entry_id=entry_id,
         workspace_id=workspace_id,
         description=description,
         tags=tags,
         project_id=project_id,
-        start=start,
-        stop=stop,
+        task_id=task_id,
+        start=final_start,
+        stop=final_stop,
         duration=duration,
         billable=billable,
     )
