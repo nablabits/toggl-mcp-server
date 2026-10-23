@@ -118,6 +118,35 @@ async def test_time_entry_lifecycle(vcr):
     assert "Successfully" in deleted
 
 
+@pytest.mark.asyncio
+@pytest.mark.vcr
+async def test_time_entry_utc_start_lifecycle(vcr):
+    # Tasks need a paid Toggl plan, so `task_id` is covered by unit tests only.
+    start = _utc_offset(-2, hour=10)
+    stop = _utc_offset(-2, hour=11)
+
+    # --- Create: "Z" is honoured as UTC ---
+    result = await create_time_entry(
+        description="UTC start test entry",
+        start=start,
+        stop=stop,
+        duration=3600,
+    )
+    assert isinstance(result, dict), f"Expected dict, got: {result}"
+    entry = result["toggle_time_entry_response"]
+    assert entry["start"].replace("+00:00", "Z") == start.replace(".000Z", "Z")
+
+    # --- Update: "Z" start is stored as given ---
+    new_start = _utc_offset(-2, hour=9)
+    updated = await update_time_entry(entry_id=entry["id"], start=new_start)
+    assert isinstance(updated, dict), f"Expected dict, got: {updated}"
+    assert updated["start"].replace("+00:00", "Z") == new_start.replace(".000Z", "Z")
+
+    # --- Cleanup ---
+    deleted = await delete_time_entry(entry_id=entry["id"])
+    assert "Successfully" in deleted
+
+
 # ---------------------------------------------------------------------------
 # Task lifecycle
 # ---------------------------------------------------------------------------

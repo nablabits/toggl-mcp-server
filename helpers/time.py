@@ -35,3 +35,20 @@ def _get_date_range(days_offset: int) -> Tuple[str, str]:
     start_dt = datetime.datetime.combine(target_date, datetime.time.min, tzinfo=timezone.utc)
     end_dt = start_dt + timedelta(days=1)
     return _iso_timestamp(start_dt), _iso_timestamp(end_dt)
+
+
+def _normalize_timestamp(value: str) -> str:
+    """Return `value` as a UTC ISO timestamp ending in 'Z'.
+
+    A trailing 'Z' or an explicit offset (e.g. '+02:00') is honoured as given.
+    A naive value (no suffix) is interpreted as system-local time. If the value
+    cannot be parsed it is returned unchanged so the API can report the error.
+    """
+    try:
+        dt = datetime.datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=get_localzone())
+        return _iso_timestamp(dt.astimezone(timezone.utc))
+    except Exception as e:
+        print(f"WARNING: Timestamp normalization failed for '{value}': {e}. Using original value.")
+        return value

@@ -17,7 +17,7 @@ This was forked from [abhinav24jha/toggl-mcp-server](https://github.com/abhinav2
 - **Workspace cache:** the workspace list is cached for the lifetime of the server process, eliminating repeat `/me/workspaces` calls within a session
 - **`TOGGL_WORKSPACE_ID` env var:** short-circuits all `/me` lookups when set — important given Toggl's 30 req/h cap on that endpoint
 - **Modular structure:** split from a single file into domain modules (`projects.py`, `tasks.py`, `time_entries.py`, `tags.py`, `clients.py`, `resources.py`)
-- **Full test suite:** 182 tests, 100% coverage, using pytest-vcr for offline replay
+- **Full test suite:** 146 tests, 100% coverage, using pytest-vcr for offline replay
 
 ### Tools
 
@@ -43,11 +43,11 @@ This was forked from [abhinav24jha/toggl-mcp-server](https://github.com/abhinav2
 
 | Tool | Description |
 | --- | --- |
-| `create_time_entry` | Start a live timer or log a completed entry |
+| `create_time_entry` | Start a live timer or log a completed entry (optionally linked to a project `task_id`) |
 | `stop_time_entry` | Stop a running time entry by name or `entry_id` |
 | `delete_time_entry` | Permanently delete a time entry by name or `entry_id` |
 | `get_current_time_entry` | Fetch the currently running entry |
-| `update_time_entry` | Update description, tags, project, or timestamps |
+| `update_time_entry` | Update description, tags, project, task, or timestamps |
 | `get_time_entries_for_range` | List entries by day-offset range or explicit `start_date`/`end_date` |
 
 #### Tag Management
@@ -284,7 +284,9 @@ uv run pytest -v
 
 **Re-recording a cassette** (e.g. after an API change): delete the `.yaml` file and re-run the test with a live network connection.
 
-**Test coverage:** 100% coverage across all files (182 tests). Updated 2026-05-28.
+**Premium-only features can't be recorded:** some Toggl functionality (e.g. tasks, and therefore linking a time entry via `task_id`) requires a paid plan. A free sandbox account answers those calls with `403 unauthorized`, so they can't be fully exercised with VCR. Cover them with mocked unit tests, and verify them manually against a premium account (or trial) before releasing. The existing task cassettes were recorded while the sandbox still had access.
+
+**Test coverage:** 100% coverage across all files (146 tests). Updated 2026-10-23.
 
 
 ## License
